@@ -1,580 +1,82 @@
 /* ============================================================
-   LLM Studio Pro — SaaS Design Tokens & UI Stylesheet
-   Theme: Clean SaaS White + Vibrant Blue + Rich Indigo/Purple
-   Matching Reference Layout 100%
+   AI Studio — Simple, Clean, User-Friendly UI Stylesheet
+   Supports Flawless Light Mode & Dark Mode
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-:root {
-    --bg-light: #F8FAFC;
-    --surface-light: #FFFFFF;
-    --primary: #2563EB;
-    --primary-hover: #1D4ED8;
-    --secondary: #7C3AED;
-    --accent: #06B6D4;
-    --text-main: #0F172A;
-    --text-muted: #64748B;
-    --text-light: #94A3B8;
-    --border-color: #E2E8F0;
-    --border-hover: #CBD5E1;
-    --badge-free-bg: #ECFDF5;
-    --badge-free-text: #059669;
-    --badge-free-border: #A7F3D0;
-    --badge-premium-bg: #FEF3C7;
-    --badge-premium-text: #D97706;
-    --badge-premium-border: #FDE68A;
-    --primary-gradient: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
-    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-    --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+/* Base Font */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
-/* Base App Styling */
-html, body, [data-testid="stAppViewContainer"] {
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    background-color: var(--bg-light) !important;
-    color: var(--text-main) !important;
-}
-
-/* Streamlit Header & Sidebar Tweaks */
+/* Header & Sidebar */
 [data-testid="stHeader"] {
-    background-color: rgba(248, 250, 252, 0.9) !important;
-    backdrop-filter: blur(10px);
+    background-color: transparent !important;
 }
 
-section[data-testid="stSidebar"] {
-    background-color: #FFFFFF !important;
-    border-right: 1px solid var(--border-color) !important;
-    padding-top: 1rem !important;
+/* Rounded Containers & Cards */
+[data-testid="stVerticalBlockBorderWrapper"] > div {
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-section[data-testid="stSidebar"] * {
-    color: var(--text-main);
-}
-
-/* ============================================================
-   TOP NAVIGATION BAR (LLM STUDIO PRO)
-   ============================================================ */
-.studio-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1.4rem;
-    background: #FFFFFF;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--card-shadow);
-    gap: 1rem;
-}
-
-.studio-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: #0F172A;
-    white-space: nowrap;
-}
-
-.studio-logo-icon {
-    font-size: 1.45rem;
-    background: linear-gradient(135deg, #2563EB, #7C3AED);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.topbar-nav {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.nav-link-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.85rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #475569;
-    text-decoration: none;
-    background: transparent;
-    border: 1px solid transparent;
-    transition: all 0.15s ease;
-}
-
-.nav-link-btn:hover {
-    background: #F1F5F9;
-    color: #0F172A;
-}
-
-.nav-link-btn.active {
-    background: #EFF6FF;
-    color: #2563EB;
-    border-color: #BFDBFE;
-}
-
-.avatar-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #4F46E5, #7C3AED);
-    color: #FFFFFF;
-    font-weight: 700;
-    font-size: 0.8rem;
-    letter-spacing: 0.05em;
-}
-
-/* ============================================================
-   HERO BANNER & 3D FLOATING SHOWCASE
-   ============================================================ */
-.hero-hub-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #FFFFFF;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 2rem 2.2rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--card-shadow);
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-text-block h1 {
-    font-size: 2.3rem;
-    font-weight: 800;
-    color: #0F172A;
-    margin: 0 0 0.5rem 0;
-    letter-spacing: -0.02em;
-}
-
-.hero-text-block h1 span {
-    background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.hero-text-block p {
-    font-size: 1.05rem;
-    color: #64748B;
-    margin: 0;
-    line-height: 1.5;
-    max-width: 650px;
-}
-
-.hero-floating-stage {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    position: relative;
-}
-
-.floating-brand-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    font-size: 1.8rem;
-    transform: translateY(-4px);
-    transition: transform 0.2s ease;
-}
-
-.floating-brand-badge:hover {
-    transform: translateY(-8px) scale(1.05);
-}
-
-/* ============================================================
-   CATEGORY PILLS & PROVIDER CHIPS
-   ============================================================ */
-.category-pills-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin-bottom: 1.5rem;
-    align-items: center;
-}
-
-.cat-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.55rem 1.1rem;
-    border-radius: 9999px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #475569;
-    background: #FFFFFF;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.cat-pill:hover {
-    background: #F8FAFC;
-    border-color: #CBD5E1;
-    color: #0F172A;
-}
-
-.cat-pill.active {
-    background: #2563EB !important;
-    color: #FFFFFF !important;
-    border-color: #2563EB !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
-}
-
-.provider-chips-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    align-items: center;
-}
-
-.prov-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.9rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    background: #FFFFFF;
-    border: 1px solid var(--border-color);
-    color: #334155;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    transition: all 0.15s ease;
-}
-
-.prov-chip:hover {
-    border-color: #94A3B8;
-    background: #F8FAFC;
-}
-
-.prov-chip.active {
-    border-color: #2563EB;
-    background: #EFF6FF;
-    color: #2563EB;
-}
-
-/* ============================================================
-   EXPLORE MODELS & MODEL CARDS (MATCHING REFERENCE EXACTLY)
-   ============================================================ */
-.explore-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.explore-title {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #0F172A;
-}
-
-.model-card-ref {
-    background: #FFFFFF;
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 1.2rem;
-    margin-bottom: 1.2rem;
-    box-shadow: var(--card-shadow);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-}
-
-.model-card-ref:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--hover-shadow);
-    border-color: #CBD5E1;
-}
-
-.card-top-line {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.card-brand-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0F172A;
-}
-
+/* Clean Badges */
 .badge-free {
-    background: var(--badge-free-bg);
-    color: var(--badge-free-text);
-    border: 1px solid var(--badge-free-border);
+    display: inline-block;
+    background: #ECFDF5;
+    color: #059669;
+    border: 1px solid #A7F3D0;
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 0.2rem 0.6rem;
+    padding: 0.15rem 0.55rem;
     border-radius: 9999px;
 }
 
 .badge-premium {
-    background: var(--badge-premium-bg);
-    color: var(--badge-premium-text);
-    border: 1px solid var(--badge-premium-border);
+    display: inline-block;
+    background: #FEF3C7;
+    color: #D97706;
+    border: 1px solid #FDE68A;
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 0.2rem 0.6rem;
+    padding: 0.15rem 0.55rem;
     border-radius: 9999px;
-}
-
-.card-tags-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-bottom: 0.65rem;
 }
 
 .tag-pill {
-    background: #F1F5F9;
-    color: #475569;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.15rem 0.55rem;
-    border-radius: 6px;
-}
-
-.card-desc {
-    font-size: 0.85rem;
-    color: #64748B;
-    line-height: 1.45;
-    margin-bottom: 0.85rem;
-    min-height: 2.6rem;
-}
-
-.card-specs-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.75rem;
-    color: #64748B;
-    padding: 0.4rem 0;
-    border-top: 1px solid #F1F5F9;
-    border-bottom: 1px solid #F1F5F9;
-    margin-bottom: 0.85rem;
-}
-
-.card-specs-row span {
-    font-weight: 600;
-}
-
-.free-tier-tag {
-    color: #059669;
-    background: #ECFDF5;
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    font-weight: 700;
-}
-
-/* ============================================================
-   RIGHT PANEL: QUICK ACTIONS, USAGE & GO PRO CARD
-   ============================================================ */
-.quick-action-card {
-    background: #FFFFFF;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.65rem;
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    box-shadow: var(--card-shadow);
-}
-
-.quick-action-card:hover {
-    background: #F8FAFC;
-    border-color: #2563EB;
-    transform: translateX(2px);
-}
-
-.action-icon-circle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: #EFF6FF;
+    display: inline-block;
+    background: rgba(37, 99, 235, 0.08);
     color: #2563EB;
-    font-size: 1.15rem;
-    flex-shrink: 0;
-}
-
-.action-title {
-    font-weight: 700;
-    font-size: 0.92rem;
-    color: #0F172A;
-    margin-bottom: 0.15rem;
-}
-
-.action-subtitle {
-    font-size: 0.78rem;
-    color: #64748B;
-}
-
-.usage-box {
-    background: #FFFFFF;
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 1.2rem;
-    margin-bottom: 1.2rem;
-    box-shadow: var(--card-shadow);
-}
-
-.usage-title {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: #0F172A;
-    margin-bottom: 0.85rem;
-}
-
-.usage-item {
-    margin-bottom: 0.75rem;
-}
-
-.usage-label-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: #475569;
-    margin-bottom: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    margin-right: 0.3rem;
 }
 
-.progress-track {
-    width: 100%;
-    height: 6px;
-    background: #F1F5F9;
-    border-radius: 9999px;
-    overflow: hidden;
+/* Buttons */
+.stButton > button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 0.45rem 1rem !important;
+    transition: all 0.15s ease !important;
 }
 
-.progress-bar-fill {
-    height: 100%;
-    border-radius: 9999px;
-    background: linear-gradient(90deg, #2563EB, #7C3AED);
+.stButton > button:hover {
+    transform: translateY(-1px) !important;
 }
 
-.pro-banner-card {
-    background: linear-gradient(135deg, #1E1B4B 0%, #2563EB 50%, #4F46E5 100%);
-    border-radius: 16px;
-    padding: 1.4rem;
-    color: #FFFFFF;
-    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
-    position: relative;
-    overflow: hidden;
+/* Modern Chat Bubbles */
+[data-testid="stChatMessage"] {
+    border-radius: 14px !important;
+    padding: 1rem 1.2rem !important;
+    margin-bottom: 0.75rem !important;
 }
 
-.pro-banner-card h3 {
-    margin: 0 0 0.75rem 0;
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: #FFFFFF !important;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.pro-feature-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1.1rem 0;
-}
-
-.pro-feature-list li {
-    font-size: 0.85rem;
-    color: #E0E7FF;
-    margin-bottom: 0.35rem;
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-}
-
-.btn-upgrade-white {
-    display: block;
-    width: 100%;
-    background: #FFFFFF;
-    color: #1E1B4B !important;
-    text-align: center;
-    padding: 0.6rem;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.88rem;
-    text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.15s ease;
-}
-
-.btn-upgrade-white:hover {
-    transform: translateY(-1px);
-    background: #F8FAFC;
-}
-
-/* ============================================================
-   SIDEBAR "GO PRO" CARD (MATCHING REFERENCE SIDEBAR BOTTOM)
-   ============================================================ */
-.sidebar-go-pro-card {
-    background: #F8FAFC;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1rem;
-    margin-top: 1rem;
-}
-
-.sidebar-go-pro-title {
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: #0F172A;
-    margin-bottom: 0.3rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.sidebar-go-pro-text {
-    font-size: 0.78rem;
-    color: #64748B;
-    line-height: 1.35;
-    margin-bottom: 0.75rem;
-}
-
-.btn-upgrade-purple {
-    display: block;
-    width: 100%;
-    background: linear-gradient(135deg, #7C3AED, #6366F1);
-    color: #FFFFFF !important;
-    text-align: center;
-    padding: 0.5rem;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
+/* Progress Bars */
+[data-testid="stProgress"] > div > div > div > div {
+    background: linear-gradient(90deg, #2563EB, #7C3AED) !important;
+    border-radius: 9999px !important;
 }

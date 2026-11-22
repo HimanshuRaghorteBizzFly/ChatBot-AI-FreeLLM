@@ -1,58 +1,51 @@
 """
-SaaS Sidebar navigation component matching LLM Studio Pro reference layout.
+Simple, user-friendly SaaS Sidebar navigation component.
 """
 import streamlit as st
 
 SIDEBAR_PAGES = [
     ("🏠 All-in-One Hub", "Dashboard"),
-    ("💬 Chat Playground", "Chat Playground"),
-    ("🎨 Image Generation", "Image Studio"),
-    ("🎬 Video Generation", "Video Studio"),
-    ("🎙️ Voice & Speech", "Speech Studio"),
-    ("🤖 All Models", "All Models"),
-    ("🌐 Providers", "Providers"),
-    ("🔑 My API Keys", "API Keys"),
-    ("📈 Usage & Limits", "Usage & Limits"),
-    ("💳 Plans & Billing", "Plans & Billing"),
-    ("💡 Saved Prompts", "Saved Prompts"),
-    ("📜 History", "Chat History"),
-    ("⚙️ Settings", "Settings")
+    ("💬 AI Chat Playground", "Chat Playground"),
+    ("🎨 Image Studio", "Image Studio"),
+    ("👁️ Vision Studio", "Vision Studio"),
+    ("🎙️ Speech Studio", "Speech Studio"),
+    ("🤖 All Models Catalog", "All Models"),
+    ("🔑 API Key Settings", "API Keys"),
+    ("📜 Chat History", "Chat History"),
+    ("⚙️ Platform Settings", "Settings")
 ]
 
 def render_sidebar():
-    """Renders the sidebar navigation matching LLM Studio Pro."""
+    """Renders a clean, user-friendly sidebar."""
     with st.sidebar:
-        # Top Logo
+        # Top Logo & Title
         st.markdown(
             """
-            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.2rem 0.8rem 0.2rem;">
-                <span style="font-size: 1.6rem;">🧠</span>
-                <div>
-                    <div style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.1;">
-                        LLM Studio <span style="color: #2563EB;">Pro</span>
-                    </div>
-                    <div style="font-size: 0.75rem; font-weight: 600; opacity: 0.7;">100% Free Community Edition</div>
+            <div style="padding: 0.2rem 0 0.8rem 0;">
+                <div style="font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🤖</span> <span>AI Studio</span>
                 </div>
+                <div style="font-size: 0.8rem; opacity: 0.7; font-weight: 600;">100% Free Community Edition</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        # Theme Switcher in Sidebar
+        # Simple Theme Selector
         current_theme = st.session_state.get("theme", "Light")
         theme_pick = st.radio(
             "Theme Mode",
             options=["☀️ Light Mode", "🌙 Dark Mode"],
             index=0 if current_theme == "Light" else 1,
             horizontal=True,
-            key="sidebar_theme_radio"
+            key="simple_sidebar_theme"
         )
         new_theme = "Light" if "Light" in theme_pick else "Dark"
         if new_theme != current_theme:
             st.session_state.theme = new_theme
             st.rerun()
 
-        st.markdown("<hr style='margin: 0.6rem 0; opacity: 0.2;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin: 0.6rem 0; opacity: 0.15;'>", unsafe_allow_html=True)
 
         current_page = st.session_state.get("current_page", "Dashboard")
         page_labels = [p[0] for p in SIDEBAR_PAGES]
@@ -60,13 +53,13 @@ def render_sidebar():
 
         default_idx = page_keys.index(current_page) if current_page in page_keys else 0
 
-        # Sidebar navigation items
+        # Simple Navigation Radio
         selected_label = st.radio(
             "Navigation",
             options=page_labels,
             index=default_idx,
             label_visibility="collapsed",
-            key="sidebar_page_radio"
+            key="simple_sidebar_nav"
         )
 
         for p in SIDEBAR_PAGES:
@@ -76,23 +69,21 @@ def render_sidebar():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Bottom "Go Pro / Free Active" Card from Reference Screenshot
+        # Quick System Status Box
         st.markdown(
             """
-            <div class="sidebar-go-pro-card">
-                <div class="sidebar-go-pro-title">
-                    <span>👑</span> <span>Go Pro (Free Active)</span>
-                </div>
-                <div class="sidebar-go-pro-text">
-                    All premium foundation models, high rate limits & parallel inference unlocked for free.
-                </div>
+            <div style="padding: 0.75rem; border-radius: 10px; background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.15);">
+                <div style="font-size: 0.82rem; font-weight: 700; color: #2563EB; margin-bottom: 0.2rem;">🟢 SYSTEM ONLINE</div>
+                <div style="font-size: 0.75rem; opacity: 0.75;">OpenRouter • Gemini • Groq • Local Ollama</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        if st.button("Upgrade Now ➔", key="btn_side_upgrade", use_container_width=True):
-            st.session_state.current_page = "Plans & Billing"
-            st.rerun()
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
-        st.caption("🟢 All Systems Operational • 120+ Models")
+        if st.button("🗑️ Clear Current Chat", key="btn_clear_chat_side", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.active_conversation_id = None
+            st.success("Chat cleared!")
+            st.rerun()
