@@ -65,6 +65,7 @@ if st.session_state.theme == "Dark":
     st.markdown(
         """
         <style>
+        /* Base Dark Mode */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
             background-color: #0F172A !important;
             color: #F8FAFC !important;
@@ -81,12 +82,33 @@ if st.session_state.theme == "Dark":
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: #F8FAFC !important;
         }
-        h1, h2, h3, h4, h5, h6, label, [data-testid="stMarkdownContainer"] p {
+
+        /* Typography & Markdown */
+        h1, h2, h3, h4, h5, h6, label, p, span, li, ul, ol, td, th, tr, table, strong, em, b, i {
             color: #F8FAFC !important;
         }
-        .card-desc, [data-testid="stMarkdownContainer"] .card-desc {
-            color: #94A3B8 !important;
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] span,
+        [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMarkdownContainer"] ul,
+        [data-testid="stMarkdownContainer"] ol,
+        [data-testid="stMarkdownContainer"] td,
+        [data-testid="stMarkdownContainer"] th,
+        [data-testid="stMarkdownContainer"] tr,
+        [data-testid="stMarkdownContainer"] table,
+        [data-testid="stMarkdownContainer"] strong,
+        [data-testid="stMarkdownContainer"] em {
+            color: #F8FAFC !important;
         }
+
+        /* Links */
+        a, [data-testid="stMarkdownContainer"] a {
+            color: #60A5FA !important;
+            text-decoration: underline !important;
+            font-weight: 600 !important;
+        }
+
+        /* Buttons */
         .stButton > button, button[kind="secondary"] {
             background-color: #334155 !important;
             color: #F8FAFC !important;
@@ -106,20 +128,8 @@ if st.session_state.theme == "Dark":
             background-color: #3B82F6 !important;
             border-color: #3B82F6 !important;
         }
-        .stTextInput > div > div > input,
-        .stSelectbox > div > div,
-        .stTextArea > div > div > textarea {
-            background-color: #1E293B !important;
-            color: #FFFFFF !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        }
-        [data-testid="stRadio"] label span, [data-testid="stCheckbox"] label span {
-            color: #F8FAFC !important;
-        }
-        .tag-pill {
-            background: rgba(96, 165, 250, 0.15) !important;
-            color: #93C5FD !important;
-        }
+
+        /* Sidebar Navigation Menu Buttons */
         section[data-testid="stSidebar"] .stButton > button {
             text-align: left !important;
             justify-content: flex-start !important;
@@ -146,14 +156,84 @@ if st.session_state.theme == "Dark":
             color: #FFFFFF !important;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
         }
+
+        /* Standard Inputs */
+        .stTextInput > div > div > input,
+        .stSelectbox > div > div,
+        .stTextArea > div > div > textarea {
+            background-color: #1E293B !important;
+            color: #FFFFFF !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+        [data-testid="stRadio"] label span, [data-testid="stCheckbox"] label span {
+            color: #F8FAFC !important;
+        }
+        .tag-pill {
+            background: rgba(96, 165, 250, 0.15) !important;
+            color: #93C5FD !important;
+        }
+
+        /* Chat Bubbles */
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
             background: linear-gradient(135deg, #3730A3 0%, #4338CA 100%) !important;
+            color: #FFFFFF !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) * {
             color: #FFFFFF !important;
         }
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
             background: #1E293B !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             color: #F8FAFC !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) * {
+            color: #F8FAFC !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) table {
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin: 0.8rem 0 !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) th,
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) td {
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            padding: 0.5rem 0.8rem !important;
+            color: #F8FAFC !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) th {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            font-weight: 700 !important;
+        }
+
+        /* Bottom Chat Input Bar & Textarea (Prompt visibility) */
+        [data-testid="stBottomBlockContainer"],
+        [data-testid="stBottom"] {
+            background-color: #0F172A !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+        [data-testid="stChatInput"] {
+            background-color: #1E293B !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 12px !important;
+        }
+        [data-testid="stChatInput"]:focus-within {
+            border-color: #60A5FA !important;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+        }
+        [data-testid="stChatInput"] textarea,
+        [data-testid="stChatInputTextArea"] {
+            background-color: transparent !important;
+            color: #FFFFFF !important;
+            caret-color: #60A5FA !important;
+            font-size: 0.95rem !important;
+        }
+        [data-testid="stChatInput"] textarea::placeholder {
+            color: #94A3B8 !important;
+            opacity: 1 !important;
+        }
+        [data-testid="stChatInputSubmitButton"] button {
+            color: #60A5FA !important;
         }
         </style>
         """,
@@ -163,6 +243,7 @@ else:
     st.markdown(
         """
         <style>
+        /* Base Light Mode */
         html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
             background-color: #F8FAFC !important;
             color: #0F172A !important;
@@ -179,12 +260,36 @@ else:
             border: 1px solid #E2E8F0 !important;
             color: #0F172A !important;
         }
-        h1, h2, h3, h4, h5, h6, label, [data-testid="stMarkdownContainer"] p {
+
+        /* Typography & Markdown - High Contrast Dark Text */
+        h1, h2, h3, h4, h5, h6, label, p, span, li, ul, ol, td, th, tr, table, strong, em, b, i {
+            color: #0F172A !important;
+        }
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] span,
+        [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMarkdownContainer"] ul,
+        [data-testid="stMarkdownContainer"] ol,
+        [data-testid="stMarkdownContainer"] td,
+        [data-testid="stMarkdownContainer"] th,
+        [data-testid="stMarkdownContainer"] tr,
+        [data-testid="stMarkdownContainer"] table,
+        [data-testid="stMarkdownContainer"] strong,
+        [data-testid="stMarkdownContainer"] em {
             color: #0F172A !important;
         }
         .card-desc, [data-testid="stMarkdownContainer"] .card-desc {
             color: #475569 !important;
         }
+
+        /* Links */
+        a, [data-testid="stMarkdownContainer"] a {
+            color: #2563EB !important;
+            text-decoration: underline !important;
+            font-weight: 600 !important;
+        }
+
+        /* Buttons */
         .stButton > button, button[kind="secondary"] {
             background-color: #FFFFFF !important;
             color: #0F172A !important;
@@ -204,20 +309,8 @@ else:
             background-color: #1D4ED8 !important;
             border-color: #1D4ED8 !important;
         }
-        .stTextInput > div > div > input,
-        .stSelectbox > div > div,
-        .stTextArea > div > div > textarea {
-            background-color: #FFFFFF !important;
-            color: #0F172A !important;
-            border: 1px solid #CBD5E1 !important;
-        }
-        [data-testid="stRadio"] label span, [data-testid="stCheckbox"] label span {
-            color: #0F172A !important;
-        }
-        .tag-pill {
-            background: rgba(37, 99, 235, 0.08) !important;
-            color: #2563EB !important;
-        }
+
+        /* Sidebar Navigation Menu Buttons */
         section[data-testid="stSidebar"] .stButton > button {
             text-align: left !important;
             justify-content: flex-start !important;
@@ -244,14 +337,86 @@ else:
             color: #FFFFFF !important;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2) !important;
         }
+
+        /* Standard Inputs */
+        .stTextInput > div > div > input,
+        .stSelectbox > div > div,
+        .stTextArea > div > div > textarea {
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+            border: 1px solid #CBD5E1 !important;
+        }
+        [data-testid="stRadio"] label span, [data-testid="stCheckbox"] label span {
+            color: #0F172A !important;
+        }
+        .tag-pill {
+            background: rgba(37, 99, 235, 0.08) !important;
+            color: #2563EB !important;
+        }
+
+        /* Chat Bubbles */
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
             background: linear-gradient(135deg, #2563EB 0%, #4338CA 100%) !important;
+            color: #FFFFFF !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) * {
             color: #FFFFFF !important;
         }
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
             background: #FFFFFF !important;
             border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
             color: #0F172A !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) * {
+            color: #0F172A !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) table {
+            border: 1px solid #CBD5E1 !important;
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin: 0.8rem 0 !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) th,
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) td {
+            border: 1px solid #E2E8F0 !important;
+            padding: 0.5rem 0.8rem !important;
+            color: #0F172A !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) th {
+            background-color: #F1F5F9 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Bottom Chat Input Bar & Textarea (Prompt visibility) */
+        [data-testid="stBottomBlockContainer"],
+        [data-testid="stBottom"] {
+            background-color: #F8FAFC !important;
+            border-top: 1px solid #E2E8F0 !important;
+        }
+        [data-testid="stChatInput"] {
+            background-color: #FFFFFF !important;
+            border: 1.5px solid #CBD5E1 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+        }
+        [data-testid="stChatInput"]:focus-within {
+            border-color: #2563EB !important;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+        }
+        [data-testid="stChatInput"] textarea,
+        [data-testid="stChatInputTextArea"] {
+            background-color: transparent !important;
+            color: #0F172A !important;
+            caret-color: #2563EB !important;
+            font-size: 0.95rem !important;
+        }
+        [data-testid="stChatInput"] textarea::placeholder {
+            color: #64748B !important;
+            opacity: 1 !important;
+        }
+        [data-testid="stChatInputSubmitButton"] button {
+            color: #2563EB !important;
         }
         </style>
         """,
