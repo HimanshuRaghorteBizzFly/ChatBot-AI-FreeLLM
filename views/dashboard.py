@@ -1,12 +1,12 @@
 """
 Dashboard / All-in-One Hub View.
-Matches the LLM Studio Pro reference UI layout with 3D hero stage,
-category pills, popular providers, 4-column model cards, and right quick actions/usage panel.
+Matches LLM Studio Pro reference layout without any raw HTML/JSON code blocks,
+with responsive cards, native progress bars, and full dark/light mode support.
 """
 import streamlit as st
 from components.navbar import render_navbar
 from components.model_card import render_model_card
-from backend.services.catalog import get_catalog_models, filter_catalog
+from backend.services.catalog import filter_catalog
 from backend.repositories.storage import get_usage_summary
 
 def render():
@@ -14,31 +14,24 @@ def render():
     render_navbar("Models")
 
     # 2. Main Two-Column Layout (Center Hub + Right Panel)
-    col_main, col_right = st.columns([2.7, 1.1])
+    col_main, col_right = st.columns([2.8, 1.1])
 
     with col_main:
-        # --- Hero Banner with 3D Floating Brand Stage ---
-        st.markdown(
-            """
-            <div class="hero-hub-container">
-                <div class="hero-text-block">
-                    <h1>All-in-One <span>LLM Studio</span></h1>
-                    <p>
-                        Access 100+ AI models from OpenRouter, GitHub, and top providers — 
-                        for Chat, Image, Video, and Speech in one place.
-                    </p>
-                </div>
-                <div class="hero-floating-stage">
-                    <div class="floating-brand-badge" title="OpenAI">⚡</div>
-                    <div class="floating-brand-badge" style="transform: translateY(-12px);" title="Google Gemini">✨</div>
-                    <div class="floating-brand-badge" style="transform: translateY(-4px);" title="Meta Llama">🦙</div>
-                    <div class="floating-brand-badge" style="transform: translateY(-16px);" title="Anthropic">🧠</div>
-                    <div class="floating-brand-badge" title="Groq">⚡</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # --- Hero Banner with 3D Floating Brand Stage (Zero Indent to prevent Markdown Code Blocks) ---
+        hero_html = """<div class="hero-hub-container">
+<div class="hero-text-block">
+<h1>All-in-One <span>LLM Studio</span></h1>
+<p>Access 100+ AI models from OpenRouter, GitHub, and top providers — for Chat, Image, Video, and Speech in one place.</p>
+</div>
+<div class="hero-floating-stage">
+<div class="floating-brand-badge" title="OpenAI">⚡</div>
+<div class="floating-brand-badge" style="transform: translateY(-10px);" title="Google Gemini">✨</div>
+<div class="floating-brand-badge" style="transform: translateY(-4px);" title="Meta Llama">🦙</div>
+<div class="floating-brand-badge" style="transform: translateY(-14px);" title="Anthropic">🧠</div>
+<div class="floating-brand-badge" title="Groq">⚡</div>
+</div>
+</div>"""
+        st.markdown(hero_html, unsafe_allow_html=True)
 
         # --- Big Search Input ---
         search_query = st.text_input(
@@ -71,10 +64,10 @@ def render():
                     st.session_state.hub_category = cat_val
                     st.rerun()
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
         # --- Popular Providers Section ---
-        st.markdown("<div style='font-size: 1.1rem; font-weight: 800; color: #0F172A; margin-bottom: 0.5rem;'>Popular Providers</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 800; margin-bottom: 0.5rem;'>Popular Providers</div>", unsafe_allow_html=True)
         
         if "hub_provider" not in st.session_state:
             st.session_state.hub_provider = "All"
@@ -87,7 +80,7 @@ def render():
             ("⚡ Groq", "Groq"),
             ("🟢 NVIDIA", "NVIDIA"),
             ("🦙 Meta Llama", "Meta"),
-            ("All", "All")
+            ("All Providers", "All")
         ]
 
         pr_cols = st.columns(len(providers))
@@ -99,7 +92,7 @@ def render():
                     st.session_state.hub_provider = p_val
                     st.rerun()
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
         # --- Explore Models Section ---
         ex_col1, ex_col2, ex_col3 = st.columns([2, 1.2, 1])
@@ -147,93 +140,54 @@ def render():
                     with grid_cols[c_idx]:
                         render_model_card(m, on_try_key=f"hub_try_{m.id}_{i}_{c_idx}")
         else:
-            st.info("No models match your current filters. Try selecting 'All Models' or resetting search.")
+            st.info("No models match your current filters. Select 'All Models' or reset your search query.")
 
     # 3. Right Sidebar / Quick Panel
     with col_right:
-        # --- Quick Actions ---
-        st.markdown(
-            """
-            <div style="font-size: 1.1rem; font-weight: 800; color: #0F172A; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
-                <span>⚡</span> <span>Quick Actions</span>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # --- Quick Actions (Container with Native Buttons) ---
+        with st.container(border=True):
+            st.markdown("#### ⚡ Quick Actions")
+            actions = [
+                ("💬 New Chat", "Talk with any LLM", "Chat Playground"),
+                ("🖼️ Generate Image", "Create images from text", "Image Studio"),
+                ("🎬 Generate Video", "Text to video", "Video Studio"),
+                ("🎙️ Text to Speech", "Synthesize voice", "Speech Studio"),
+                ("🎧 Speech to Text", "Transcribe audio", "Speech Studio")
+            ]
 
-        actions = [
-            ("💬 New Chat", "Talk with any LLM", "Chat Playground"),
-            ("🖼️ Generate Image", "Create images from text", "Image Studio"),
-            ("🎬 Generate Video", "Text to video (select models)", "Video Studio"),
-            ("🎙️ Text to Speech", "Convert text to natural voice", "Speech Studio"),
-            ("🎧 Speech to Text", "Transcribe audio to text", "Speech Studio")
-        ]
+            for title, sub, target_page in actions:
+                if st.button(f"{title} • {sub}", key=f"qa_{title}", use_container_width=True):
+                    st.session_state.current_page = target_page
+                    st.rerun()
 
-        for title, sub, target_page in actions:
-            if st.button(f"{title}\n\n{sub}", key=f"qa_{title}", use_container_width=True):
-                st.session_state.current_page = target_page
+        # --- Your Usage (This Month) (Using Native Streamlit Progress Bars) ---
+        with st.container(border=True):
+            st.markdown("#### 📊 Your Usage (This Month)")
+            usage_data = get_usage_summary()
+            tokens_val = min(usage_data.get("total_tokens", 45000), 500000)
+
+            st.write(f"**Text Tokens:** {tokens_val // 1000}K / 500K")
+            st.progress(min(1.0, max(0.04, tokens_val / 500000)))
+
+            st.write("**Image Generation:** 12 / 200")
+            st.progress(0.06)
+
+            st.write("**Speech (TTS):** 5 / 100")
+            st.progress(0.05)
+            st.caption("🟢 All Free Tier Quotas Active")
+
+        # --- Upgrade to Pro / Free Forever Card (Zero Indent) ---
+        with st.container(border=True):
+            pro_card_html = """<div class="pro-banner-card">
+<h3 style="margin: 0 0 0.5rem 0; color: #FFFFFF !important; font-size: 1.15rem; font-weight: 800;">👑 Upgrade to Pro</h3>
+<div style="font-size: 0.85rem; color: #E0E7FF; line-height: 1.6; margin-bottom: 0.8rem;">
+<div>✓ Access premium & latest models</div>
+<div>✓ Higher rate limits</div>
+<div>✓ Priority processing</div>
+<div>✓ Commercial usage rights</div>
+</div>
+</div>"""
+            st.markdown(pro_card_html, unsafe_allow_html=True)
+            if st.button("View Plans & Pricing ➔", key="btn_right_view_plans", use_container_width=True, type="primary"):
+                st.session_state.current_page = "Plans & Billing"
                 st.rerun()
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # --- Your Usage (This Month) ---
-        usage_data = get_usage_summary()
-        tokens_val = min(usage_data.get("total_tokens", 45000), 500000)
-        
-        st.markdown(
-            f"""
-            <div class="usage-box">
-                <div class="usage-title">Your Usage (This Month)</div>
-                
-                <div class="usage-item">
-                    <div class="usage-label-row">
-                        <span>Text Tokens</span>
-                        <span>{tokens_val // 1000}K / 500K</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-bar-fill" style="width: {max(5, int((tokens_val / 500000) * 100))}%;"></div>
-                    </div>
-                </div>
-
-                <div class="usage-item">
-                    <div class="usage-label-row">
-                        <span>Image Generation</span>
-                        <span>12 / 200</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-bar-fill" style="width: 12%;"></div>
-                    </div>
-                </div>
-
-                <div class="usage-item">
-                    <div class="usage-label-row">
-                        <span>Speech (TTS)</span>
-                        <span>5 / 100</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-bar-fill" style="width: 8%;"></div>
-                    </div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        # --- Upgrade to Pro / Free Banner Card ---
-        st.markdown(
-            """
-            <div class="pro-banner-card">
-                <h3><span>👑</span> Upgrade to Pro</h3>
-                <ul class="pro-feature-list">
-                    <li>✓ Access premium & latest models</li>
-                    <li>✓ Higher rate limits</li>
-                    <li>✓ Priority processing</li>
-                    <li>✓ Commercial usage rights</li>
-                </ul>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("View Plans & Pricing ➔", key="btn_right_view_plans", use_container_width=True, type="primary"):
-            st.session_state.current_page = "Plans & Billing"
-            st.rerun()

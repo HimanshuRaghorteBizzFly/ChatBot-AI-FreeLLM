@@ -25,18 +25,34 @@ def render_sidebar():
         # Top Logo
         st.markdown(
             """
-            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.2rem 1rem 0.2rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.2rem 0.8rem 0.2rem;">
                 <span style="font-size: 1.6rem;">🧠</span>
                 <div>
-                    <div style="font-size: 1.25rem; font-weight: 800; color: #0F172A; letter-spacing: -0.01em; line-height: 1.1;">
+                    <div style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.1;">
                         LLM Studio <span style="color: #2563EB;">Pro</span>
                     </div>
-                    <div style="font-size: 0.75rem; color: #64748B; font-weight: 600;">100% Free Community Edition</div>
+                    <div style="font-size: 0.75rem; font-weight: 600; opacity: 0.7;">100% Free Community Edition</div>
                 </div>
             </div>
             """,
             unsafe_allow_html=True
         )
+
+        # Theme Switcher in Sidebar
+        current_theme = st.session_state.get("theme", "Light")
+        theme_pick = st.radio(
+            "Theme Mode",
+            options=["☀️ Light Mode", "🌙 Dark Mode"],
+            index=0 if current_theme == "Light" else 1,
+            horizontal=True,
+            key="sidebar_theme_radio"
+        )
+        new_theme = "Light" if "Light" in theme_pick else "Dark"
+        if new_theme != current_theme:
+            st.session_state.theme = new_theme
+            st.rerun()
+
+        st.markdown("<hr style='margin: 0.6rem 0; opacity: 0.2;'>", unsafe_allow_html=True)
 
         current_page = st.session_state.get("current_page", "Dashboard")
         page_labels = [p[0] for p in SIDEBAR_PAGES]
