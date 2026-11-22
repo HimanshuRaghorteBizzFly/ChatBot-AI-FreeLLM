@@ -12,7 +12,18 @@ env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
 def get_env_var(name: str) -> str:
-    return os.getenv(name, "").strip()
+    # 1. Check os.environ / .env
+    val = os.getenv(name, "")
+    if val:
+        return val.strip()
+    # 2. Check Streamlit Cloud st.secrets
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and name in st.secrets:
+            return str(st.secrets[name]).strip()
+    except Exception:
+        pass
+    return ""
 
 def save_env_var(name: str, value: str) -> bool:
     """Saves or updates a key in the .env file."""
