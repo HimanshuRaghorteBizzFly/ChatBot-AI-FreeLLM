@@ -1,0 +1,40 @@
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Environment Variables & Secrets (CRITICAL)
+.env
+api keys.txt
+*.key
+*.pem
+
+# Streamlit Local Secrets
+.streamlit/secrets.toml
+
+# Generated Content & Cache
+generated_images/
+.cache/
+*.log
+
+# OS & Editor Metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
