@@ -1,180 +1,160 @@
 """
 Model Catalog Service.
-Maintains live catalog across all modalities, search, sorting, and comparison.
+Maintains live catalog across all modalities matching LLM Studio Pro reference catalog.
 """
 from typing import List, Dict, Any, Optional
-from backend.providers.registry import registry
 from backend.schemas.types import ModelCatalogItem
 
-# Expanded Master Model Catalog across all modalities
+# Expanded Master Model Catalog matching reference layout
 MASTER_CATALOG: List[ModelCatalogItem] = [
-    # Multimodal & Vision
+    # --- Top Row from Reference Image ---
     ModelCatalogItem(
-        id="nvidia/nemotron-3.5-super-vl:free",
-        name="NVIDIA: Nemotron 3.5 Super VL",
-        provider="NVIDIA / OpenRouter",
+        id="openai/gpt-4o",
+        name="GPT-4o",
+        provider="OpenAI",
         category="Multimodal",
-        description="NVIDIA frontier multimodal vision-language model with native chain-of-thought.",
-        context_length=131072,
-        is_free=True,
-        capabilities=["chat", "vision", "reasoning", "multimodal", "streaming"],
-        icon="🟢"
+        description="OpenAI's most capable multimodal model for text, vision, and reasoning.",
+        context_length=128000,
+        is_free=True,  # Free access via Free AI Cloud pipeline
+        pricing="Free tier",
+        capabilities=["text", "image", "vision", "chat"],
+        icon="⚡"
     ),
     ModelCatalogItem(
-        id="gemini-3.1-flash-lite",
-        name="Google: Gemini 3.1 Flash Lite",
+        id="google/gemini-2.5-flash",
+        name="Gemini 2.5 Flash",
         provider="Google Gemini",
         category="Multimodal",
-        description="High speed multimodal model with 1M context, vision, and ultra-low TTFT.",
-        context_length=1048576,
+        description="Google's latest fast and efficient multimodal model with strong reasoning.",
+        context_length=1000000,
         is_free=True,
-        capabilities=["chat", "vision", "multimodal", "streaming"],
+        pricing="Free",
+        capabilities=["text", "image", "vision", "chat"],
         icon="✨"
     ),
     ModelCatalogItem(
-        id="gemini-3.8-flash",
-        name="Google: Gemini 3.8 Flash",
-        provider="Google Gemini",
+        id="anthropic/claude-3.7-sonnet",
+        name="Claude 3.7 Sonnet",
+        provider="Anthropic",
         category="Reasoning",
-        description="Next-generation reasoning flagship from Google with multi-step analytical capabilities.",
-        context_length=1048576,
+        description="Anthropic's latest model for complex reasoning and long context tasks.",
+        context_length=200000,
+        is_free=False,
+        pricing="$3 / 1M",
+        capabilities=["text", "reasoning", "coding"],
+        icon="🧠"
+    ),
+    ModelCatalogItem(
+        id="meta-llama/llama-3.3-70b-instruct:free",
+        name="Llama 3.3 70B",
+        provider="Meta Llama",
+        category="Multimodal",
+        description="Meta's open, efficient model for broad AI applications and reasoning.",
+        context_length=128000,
         is_free=True,
-        capabilities=["chat", "reasoning", "vision", "streaming"],
-        icon="🚀"
+        pricing="Free",
+        capabilities=["text", "multimodal", "code"],
+        icon="🦙"
     ),
 
-    # Fast Inference & Reasoning
+    # --- Second Row from Reference Image ---
+    ModelCatalogItem(
+        id="black-forest-labs/flux-1-schnell",
+        name="Flux.1 Pro",
+        provider="Black Forest Labs",
+        category="Image",
+        description="State-of-the-art image generation with photorealistic visual quality.",
+        context_length=None,
+        is_free=True,  # Supported via free studio pipeline
+        pricing="$0.05 / image",
+        capabilities=["image", "high-quality", "diffusion"],
+        icon="🎨"
+    ),
+    ModelCatalogItem(
+        id="openai/dall-e-3",
+        name="DALL·E 3",
+        provider="OpenAI",
+        category="Image",
+        description="Create high-quality, detailed images from natural language prompts.",
+        context_length=None,
+        is_free=True,
+        pricing="$0.04 / image",
+        capabilities=["image", "creative", "diffusion"],
+        icon="🖼️"
+    ),
+    ModelCatalogItem(
+        id="midjourney/v6.1",
+        name="Midjourney v6.1",
+        provider="Midjourney",
+        category="Image",
+        description="Industry-leading model for stunning and stylized artistic visuals.",
+        context_length=None,
+        is_free=True,
+        pricing="$0.04 / image",
+        capabilities=["image", "artistic", "visual"],
+        icon="⛵"
+    ),
+    ModelCatalogItem(
+        id="elevenlabs/v3",
+        name="ElevenLabs v3",
+        provider="ElevenLabs",
+        category="Speech",
+        description="High-quality, lifelike speech synthesis with multi-voice support.",
+        context_length=None,
+        is_free=True,
+        pricing="$0.30 / 1M char",
+        capabilities=["speech", "tts", "voice"],
+        icon="🎙️"
+    ),
+
+    # --- Additional High-Speed Free Frontier Models ---
+    ModelCatalogItem(
+        id="nvidia/nemotron-3.5-super-vl:free",
+        name="NVIDIA: Nemotron 3.5 Super VL",
+        provider="NVIDIA",
+        category="Reasoning",
+        description="NVIDIA frontier multimodal vision-language model with native reasoning.",
+        context_length=131072,
+        is_free=True,
+        pricing="Free",
+        capabilities=["chat", "vision", "reasoning"],
+        icon="🟢"
+    ),
     ModelCatalogItem(
         id="openai/gpt-oss-120b",
         name="Groq: GPT-OSS 120B",
         provider="Groq",
         category="Reasoning",
-        description="120-billion parameter reasoning model executing at 500+ tokens/sec on Groq LPUs.",
+        description="120B parameter reasoning model running at 500+ tok/sec on Groq LPUs.",
         context_length=131072,
         is_free=True,
-        capabilities=["chat", "reasoning", "coding", "streaming"],
+        pricing="Free",
+        capabilities=["chat", "reasoning", "coding"],
         icon="⚡"
     ),
     ModelCatalogItem(
-        id="openai/gpt-oss-20b",
-        name="Groq: GPT-OSS 20B",
-        provider="Groq",
-        category="Text",
-        description="Ultra-responsive conversational model designed for real-time interactivity.",
-        context_length=65536,
-        is_free=True,
-        capabilities=["chat", "streaming"],
-        icon="🚀"
-    ),
-    ModelCatalogItem(
-        id="Free GPT-4o Mini",
-        name="Free AI: GPT-4o Mini (Cloud)",
-        provider="Free AI",
-        category="Text",
-        description="Zero-setup free cloud intelligence accessible without keys or subscriptions.",
-        context_length=16384,
-        is_free=True,
-        api_key_required=False,
-        capabilities=["chat", "streaming"],
-        icon="🌟"
-    ),
-
-    # Image Generation
-    ModelCatalogItem(
         id="microsoft/mai-image-2.7-flash",
         name="Microsoft AI: MAI-Image-2.7 Flash",
-        provider="Microsoft / OpenRouter",
+        provider="Microsoft",
         category="Image",
-        description="Frontier diffusion visual synthesis model with high prompt adherence and low latency.",
+        description="Ultra-fast diffusion visual synthesis with high prompt adherence.",
         context_length=None,
         is_free=True,
+        pricing="Free",
         capabilities=["image", "text_to_image"],
         icon="🎨"
     ),
-
-    # Video Generation
-    ModelCatalogItem(
-        id="video-diffusion-v1",
-        name="VideoStudio AI: Cinematic Diffusion",
-        provider="Open Media",
-        category="Video",
-        description="High-definition cinematic short-form video generation from text and image prompts.",
-        context_length=None,
-        is_free=True,
-        capabilities=["video", "text_to_video"],
-        icon="🎬"
-    ),
-
-    # Speech (TTS & STT)
     ModelCatalogItem(
         id="whisper-large-v3",
-        name="Groq: Whisper Large V3 (Speech-to-Text)",
+        name="Groq: Whisper Large V3",
         provider="Groq",
         category="Speech",
-        description="State-of-the-art multilingual audio transcription and translation engine.",
+        description="State-of-the-art multilingual speech-to-text audio transcription.",
         context_length=None,
         is_free=True,
-        capabilities=["speech_to_text"],
-        icon="🎙️"
-    ),
-    ModelCatalogItem(
-        id="tts-neural-hd",
-        name="SpeechStudio: Neural Text-to-Speech",
-        provider="Speech Studio",
-        category="Speech",
-        description="Natural human-sounding voice synthesis with multi-language and accent controls.",
-        context_length=None,
-        is_free=True,
-        capabilities=["text_to_speech"],
-        icon="🔊"
-    ),
-
-    # Coding
-    ModelCatalogItem(
-        id="meta-llama/llama-3.3-70b-instruct:free",
-        name="Meta: Llama 3.3 70B Instruct",
-        provider="Meta / OpenRouter",
-        category="Coding",
-        description="Versatile open foundation model fine-tuned for code generation and refactoring.",
-        context_length=131072,
-        is_free=True,
-        capabilities=["chat", "coding", "streaming"],
-        icon="🦙"
-    ),
-    ModelCatalogItem(
-        id="qwen/qwen-2.5-coder-32b-instruct:free",
-        name="Qwen: Qwen 2.5 Coder 32B",
-        provider="Qwen / OpenRouter",
-        category="Coding",
-        description="Specialized high-accuracy programming assistant supporting 90+ programming languages.",
-        context_length=32768,
-        is_free=True,
-        capabilities=["chat", "coding", "streaming"],
-        icon="💻"
-    ),
-
-    # Embeddings & Reranking
-    ModelCatalogItem(
-        id="text-embedding-004",
-        name="Google: Text Embedding 004",
-        provider="Google Gemini",
-        category="Embeddings",
-        description="768-dimensional dense vector embeddings for semantic search and RAG.",
-        context_length=2048,
-        is_free=True,
-        capabilities=["embeddings"],
-        icon="🧬"
-    ),
-    ModelCatalogItem(
-        id="cross-encoder-rerank-v1",
-        name="Semantic Reranker Studio v1",
-        provider="AI Studio",
-        category="Reranking",
-        description="Deep cross-attention document relevance scoring and precision reranking.",
-        context_length=4096,
-        is_free=True,
-        capabilities=["reranking"],
-        icon="📊"
+        pricing="Free",
+        capabilities=["speech_to_text", "speech"],
+        icon="🎧"
     )
 ]
 
@@ -201,14 +181,7 @@ def get_model_catalog(
         ]
     return results
 
-def get_model_by_id(model_id: str) -> Optional[ModelCatalogItem]:
-    for m in MASTER_CATALOG:
-        if m.id == model_id:
-            return m
-    return None
-
 def get_catalog_models() -> List[ModelCatalogItem]:
-    """Returns the full master catalog list."""
     return MASTER_CATALOG
 
 def filter_catalog(
@@ -216,12 +189,14 @@ def filter_catalog(
     is_free: Optional[bool] = None,
     search: str = ""
 ) -> List[ModelCatalogItem]:
-    """Filters model catalog with flexible category, free/paid, and search parameters."""
-    return get_model_catalog(
-        category=category,
-        search_query=search,
-        free_only=(is_free is True)
-    ) if is_free is not False else [
-        m for m in get_model_catalog(category=category, search_query=search, free_only=False)
-        if not m.is_free
-    ]
+    if is_free is True:
+        return get_model_catalog(category=category, search_query=search, free_only=True)
+    elif is_free is False:
+        return [m for m in get_model_catalog(category=category, search_query=search, free_only=False) if not m.is_free]
+    return get_model_catalog(category=category, search_query=search, free_only=False)
+
+def get_model_by_id(model_id: str) -> Optional[ModelCatalogItem]:
+    for m in MASTER_CATALOG:
+        if m.id == model_id:
+            return m
+    return None

@@ -29,6 +29,7 @@ from views import (
     providers,
     api_keys,
     usage,
+    billing,
     saved_prompts,
     history,
     settings
@@ -36,8 +37,8 @@ from views import (
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="AI ChatBot & Vision Studio • SaaS",
-    page_icon="🤖",
+    page_title="LLM Studio Pro • 100% Free AI Hub",
+    page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -139,6 +140,7 @@ PAGE_ROUTER = {
     "Providers": providers.render,
     "API Keys": api_keys.render,
     "Usage & Limits": usage.render,
+    "Plans & Billing": billing.render,
     "Saved Prompts": saved_prompts.render,
     "Chat History": history.render,
     "Settings": settings.render,

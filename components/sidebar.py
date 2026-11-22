@@ -1,90 +1,82 @@
 """
-SaaS Sidebar navigation component with 16 functional pages.
+SaaS Sidebar navigation component matching LLM Studio Pro reference layout.
 """
 import streamlit as st
-from backend.repositories.storage import get_user_preferences, update_user_preferences
 
-PAGES = [
-    ("📊 Dashboard", "Dashboard"),
-    ("💬 AI Chat Playground", "Chat Playground"),
-    ("🤖 All AI Models", "All Models"),
-    ("🎨 Image Studio", "Image Studio"),
-    ("🎬 Video Studio", "Video Studio"),
-    ("🎙️ Speech Studio", "Speech Studio"),
-    ("👁️ Vision Studio", "Vision Studio"),
-    ("🧬 Embeddings", "Embeddings"),
-    ("📊 Reranking", "Reranking"),
-    ("⚖️ Model Comparison", "Model Comparison"),
-    ("🏢 Providers", "Providers"),
-    ("🔑 API Key Management", "API Keys"),
+SIDEBAR_PAGES = [
+    ("🏠 All-in-One Hub", "Dashboard"),
+    ("💬 Chat Playground", "Chat Playground"),
+    ("🎨 Image Generation", "Image Studio"),
+    ("🎬 Video Generation", "Video Studio"),
+    ("🎙️ Voice & Speech", "Speech Studio"),
+    ("🤖 All Models", "All Models"),
+    ("🌐 Providers", "Providers"),
+    ("🔑 My API Keys", "API Keys"),
     ("📈 Usage & Limits", "Usage & Limits"),
+    ("💳 Plans & Billing", "Plans & Billing"),
     ("💡 Saved Prompts", "Saved Prompts"),
-    ("📜 Chat History", "Chat History"),
+    ("📜 History", "Chat History"),
     ("⚙️ Settings", "Settings")
 ]
 
 def render_sidebar():
-    """Renders the comprehensive 16-page navigation sidebar."""
+    """Renders the sidebar navigation matching LLM Studio Pro."""
     with st.sidebar:
-        # SaaS Branding
+        # Top Logo
         st.markdown(
             """
-            <div style="padding: 0.6rem 0.2rem 1.2rem 0.2rem;">
-                <h2 style="margin: 0; font-size: 1.45rem; font-weight: 800; background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                    🤖 AI Studio SaaS
-                </h2>
-                <p style="margin: 0.2rem 0 0 0; font-size: 0.85rem; color: #64748B;">
-                    Universal Multi-LLM & Vision Suite
-                </p>
+            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.2rem 1rem 0.2rem;">
+                <span style="font-size: 1.6rem;">🧠</span>
+                <div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: #0F172A; letter-spacing: -0.01em; line-height: 1.1;">
+                        LLM Studio <span style="color: #2563EB;">Pro</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748B; font-weight: 600;">100% Free Community Edition</div>
+                </div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        # Theme Selector
-        current_theme = st.session_state.get("theme", "Light")
-        theme_choice = st.radio(
-            "🎨 Theme Mode",
-            options=["☀️ Light Mode", "🌙 Dark Mode"],
-            index=0 if current_theme == "Light" else 1,
-            horizontal=True,
-            key="theme_radio_sidebar"
-        )
-        st.session_state.theme = "Light" if "Light" in theme_choice else "Dark"
-
-        st.markdown("---")
-
-        # 16-Page Navigation Selector
-        st.markdown("<p style='font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #64748B; margin-bottom: 0.4rem;'>Navigation</p>", unsafe_allow_html=True)
-        page_labels = [p[0] for p in PAGES]
-        page_keys = [p[1] for p in PAGES]
-
         current_page = st.session_state.get("current_page", "Dashboard")
-        default_index = page_keys.index(current_page) if current_page in page_keys else 0
+        page_labels = [p[0] for p in SIDEBAR_PAGES]
+        page_keys = [p[1] for p in SIDEBAR_PAGES]
 
+        default_idx = page_keys.index(current_page) if current_page in page_keys else 0
+
+        # Sidebar navigation items
         selected_label = st.radio(
-            "Select Page",
+            "Navigation",
             options=page_labels,
-            index=default_index,
+            index=default_idx,
             label_visibility="collapsed",
-            key="sidebar_page_nav"
+            key="sidebar_page_radio"
         )
-        
-        # Update active page
-        for p in PAGES:
+
+        for p in SIDEBAR_PAGES:
             if p[0] == selected_label:
                 st.session_state.current_page = p[1]
                 break
 
-        st.markdown("---")
+        st.markdown("<br>", unsafe_allow_html=True)
 
-        # Quick System Status
+        # Bottom "Go Pro / Free Active" Card from Reference Screenshot
         st.markdown(
             """
-            <div style="padding: 0.6rem; border-radius: 10px; background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.15);">
-                <div style="font-size: 0.8rem; font-weight: 700; color: #2563EB; margin-bottom: 0.2rem;">🟢 SYSTEM ONLINE</div>
-                <div style="font-size: 0.75rem; color: #64748B;">Engines: OpenRouter • Gemini • Groq • Ollama</div>
+            <div class="sidebar-go-pro-card">
+                <div class="sidebar-go-pro-title">
+                    <span>👑</span> <span>Go Pro (Free Active)</span>
+                </div>
+                <div class="sidebar-go-pro-text">
+                    All premium foundation models, high rate limits & parallel inference unlocked for free.
+                </div>
             </div>
             """,
             unsafe_allow_html=True
         )
+
+        if st.button("Upgrade Now ➔", key="btn_side_upgrade", use_container_width=True):
+            st.session_state.current_page = "Plans & Billing"
+            st.rerun()
+
+        st.caption("🟢 All Systems Operational • 120+ Models")

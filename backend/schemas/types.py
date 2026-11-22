@@ -18,6 +18,7 @@ class ModelCatalogItem(BaseModel):
     description: str = ""
     context_length: Optional[int] = None
     is_free: bool = True
+    pricing: Optional[str] = None
     input_price: Optional[float] = 0.0  # per 1M tokens
     output_price: Optional[float] = 0.0
     capabilities: List[str] = Field(default_factory=lambda: ["chat"])

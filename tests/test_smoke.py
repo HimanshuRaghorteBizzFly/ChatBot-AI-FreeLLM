@@ -17,6 +17,7 @@ from views import (
     providers,
     api_keys,
     usage,
+    billing,
     saved_prompts,
     history,
     settings
@@ -36,13 +37,14 @@ ALL_VIEWS = [
     providers,
     api_keys,
     usage,
+    billing,
     saved_prompts,
     history,
     settings
 ]
 
-def test_all_16_views_exposed():
-    assert len(ALL_VIEWS) == 16
+def test_all_views_exposed():
+    assert len(ALL_VIEWS) == 17
     for v in ALL_VIEWS:
         assert hasattr(v, "render"), f"View {v.__name__} missing render() function"
         assert callable(v.render), f"View {v.__name__}.render is not callable"
