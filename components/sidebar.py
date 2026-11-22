@@ -1,6 +1,7 @@
 """
 Simple, user-friendly SaaS Sidebar navigation component.
-Supports safe two-way synchronization between sidebar radio and button navigations.
+Uses sleek full-width menu navigation buttons matching modern SaaS applications,
+completely immune to widget instantiation errors.
 """
 import streamlit as st
 
@@ -18,18 +19,13 @@ SIDEBAR_PAGES = [
 
 def set_page(page_name: str):
     """
-    Safely navigates to a target page programmatically and keeps
-    the sidebar navigation radio completely in sync.
+    Safely navigates to a target page programmatically without widget conflicts.
     """
     st.session_state.current_page = page_name
-    st.session_state._last_page = page_name
-    for label, key in SIDEBAR_PAGES:
-        if key == page_name:
-            st.session_state["simple_sidebar_nav"] = label
-            break
+    st.rerun()
 
 def render_sidebar():
-    """Renders a clean, user-friendly sidebar."""
+    """Renders a clean, user-friendly SaaS sidebar."""
     with st.sidebar:
         # Top Logo & Title
         st.markdown(
@@ -61,44 +57,21 @@ def render_sidebar():
         st.markdown("<hr style='margin: 0.6rem 0; opacity: 0.15;'>", unsafe_allow_html=True)
 
         current_page = st.session_state.get("current_page", "Dashboard")
-        page_labels = [p[0] for p in SIDEBAR_PAGES]
-        page_keys = [p[1] for p in SIDEBAR_PAGES]
 
-        # 1. Sync simple_sidebar_nav if current_page changed programmatically
-        if "_last_page" not in st.session_state:
-            st.session_state._last_page = current_page
-
-        if st.session_state._last_page != current_page:
-            for label, key in SIDEBAR_PAGES:
-                if key == current_page:
-                    st.session_state["simple_sidebar_nav"] = label
-                    break
-            st.session_state._last_page = current_page
-
-        target_label = page_labels[0]
-        for label, key in SIDEBAR_PAGES:
-            if key == current_page:
-                target_label = label
-                break
-
-        default_idx = page_labels.index(target_label) if target_label in page_labels else 0
-
-        # Simple Navigation Radio
-        selected_label = st.radio(
-            "Navigation",
-            options=page_labels,
-            index=default_idx,
-            label_visibility="collapsed",
-            key="simple_sidebar_nav"
+        # SaaS Vertical Navigation Menu
+        st.markdown(
+            "<div style='font-size: 0.75rem; font-weight: 700; opacity: 0.6; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em;'>Navigation</div>",
+            unsafe_allow_html=True
         )
 
-        for p in SIDEBAR_PAGES:
-            if p[0] == selected_label:
-                st.session_state.current_page = p[1]
-                st.session_state._last_page = p[1]
-                break
+        for label, page_key in SIDEBAR_PAGES:
+            is_active = (current_page == page_key)
+            btn_type = "primary" if is_active else "secondary"
+            if st.button(label, key=f"sidebar_nav_{page_key}", use_container_width=True, type=btn_type):
+                if current_page != page_key:
+                    set_page(page_key)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin: 0.8rem 0 0.6rem 0; opacity: 0.15;'>", unsafe_allow_html=True)
 
         # Quick System Status Box
         st.markdown(

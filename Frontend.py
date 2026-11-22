@@ -120,6 +120,32 @@ if st.session_state.theme == "Dark":
             background: rgba(96, 165, 250, 0.15) !important;
             color: #93C5FD !important;
         }
+        section[data-testid="stSidebar"] .stButton > button {
+            text-align: left !important;
+            justify-content: flex-start !important;
+            width: 100% !important;
+            padding: 0.55rem 0.85rem !important;
+            border-radius: 8px !important;
+            font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 0.15rem !important;
+        }
+        section[data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+            background-color: transparent !important;
+            border: 1px solid transparent !important;
+            color: #94A3B8 !important;
+        }
+        section[data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+            background-color: #334155 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #F8FAFC !important;
+        }
+        section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+            background-color: #2563EB !important;
+            border-color: #2563EB !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+        }
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
             background: linear-gradient(135deg, #3730A3 0%, #4338CA 100%) !important;
             color: #FFFFFF !important;
@@ -191,6 +217,32 @@ else:
         .tag-pill {
             background: rgba(37, 99, 235, 0.08) !important;
             color: #2563EB !important;
+        }
+        section[data-testid="stSidebar"] .stButton > button {
+            text-align: left !important;
+            justify-content: flex-start !important;
+            width: 100% !important;
+            padding: 0.55rem 0.85rem !important;
+            border-radius: 8px !important;
+            font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 0.15rem !important;
+        }
+        section[data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+            background-color: transparent !important;
+            border: 1px solid transparent !important;
+            color: #475569 !important;
+        }
+        section[data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+            background-color: #F1F5F9 !important;
+            border-color: #E2E8F0 !important;
+            color: #0F172A !important;
+        }
+        section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+            background-color: #2563EB !important;
+            border-color: #2563EB !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2) !important;
         }
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
             background: linear-gradient(135deg, #2563EB 0%, #4338CA 100%) !important;
