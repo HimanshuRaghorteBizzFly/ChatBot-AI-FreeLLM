@@ -2,15 +2,26 @@
 Image Studio View.
 Full text-to-image synthesis, aspect ratio controls, negative prompts,
 direct local rendering to prevent broken icons, and media gallery.
+Dedicated strictly to photorealistic visual generation.
 """
 import os
 import streamlit as st
 from components.navbar import render_navbar
+from components.sidebar import set_page
 from backend.services.images import generate_image_studio
 from backend.repositories.storage import list_generated_media
 
 def render():
     render_navbar("🎨 AI Image Studio", "High-Resolution Diffusion Synthesis with Microsoft MAI & FLUX Engines")
+
+    # Banner separating Image Studio from Chat
+    b_col1, b_col2 = st.columns([3.5, 1.2])
+    with b_col1:
+        st.info("🎨 **Image Studio Mode**: Focused on visual synthesis and artwork generation. For text conversation & coding, visit the **Chat Playground**.")
+    with b_col2:
+        if st.button("💬 Go to Chat Playground", use_container_width=True, key="img_to_chat_banner"):
+            set_page("Chat Playground")
+            st.rerun()
 
     c1, c2 = st.columns([1.8, 1.2])
 
@@ -52,39 +63,46 @@ def render():
         clean_ar = aspect_ratio.split()[0]
         generate_clicked = st.button("🚀 Generate Visual Artwork", type="primary", use_container_width=True, key="btn_gen_img")
 
+    # Handle image generation execution
+    if generate_clicked:
+        if not prompt.strip():
+            st.warning("Please enter an image prompt first.")
+        else:
+            with st.spinner("✨ Synthesizing pixels and generating high-res visual..."):
+                result = generate_image_studio(
+                    prompt=prompt,
+                    model=model,
+                    aspect_ratio=clean_ar
+                )
+                st.session_state.studio_last_result = result
+                st.session_state.studio_last_prompt = prompt
+
     with c2:
         st.markdown("### 🖼️ Live Studio Preview")
-        if generate_clicked:
-            if not prompt.strip():
-                st.warning("Please enter an image prompt first.")
+        last_result = st.session_state.get("studio_last_result")
+        if last_result:
+            local_path = last_result.get("path")
+            if local_path and os.path.exists(local_path):
+                active_prompt = st.session_state.get("studio_last_prompt", prompt)
+                st.image(local_path, caption=f"Prompt: {active_prompt}", use_container_width=True)
+                st.success(last_result.get("notice", "Image generated successfully!"))
+                
+                try:
+                    with open(local_path, "rb") as f:
+                        st.download_button(
+                            "📥 Download Artwork (High-Res)",
+                            data=f.read(),
+                            file_name=os.path.basename(local_path),
+                            mime="image/jpeg",
+                            use_container_width=True,
+                            key="dl_live_studio_img"
+                        )
+                except Exception:
+                    pass
             else:
-                with st.spinner("✨ Synthesizing pixels and downloading high-res binary..."):
-                    result = generate_image_studio(
-                        prompt=prompt,
-                        model=model,
-                        aspect_ratio=clean_ar
-                    )
-                    local_path = result.get("path")
-                    if local_path and os.path.exists(local_path):
-                        st.image(local_path, caption=f"Prompt: {prompt}", use_container_width=True)
-                        st.success(result.get("notice", "Image generated successfully!"))
-                        
-                        try:
-                            with open(local_path, "rb") as f:
-                                st.download_button(
-                                    "📥 Download Artwork (High-Res)",
-                                    data=f.read(),
-                                    file_name=os.path.basename(local_path),
-                                    mime="image/jpeg",
-                                    use_container_width=True,
-                                    key="dl_live_studio_img"
-                                )
-                        except Exception:
-                            pass
-                    else:
-                        st.error(result.get("notice", "Failed to render image."))
+                st.error(last_result.get("notice", "Failed to render image."))
         else:
-            st.info("💡 Enter your prompt on the left and click **Generate** to render your image here.")
+            st.info("💡 Enter your prompt on the left and click **🚀 Generate Visual Artwork** to render your image here.")
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.divider()

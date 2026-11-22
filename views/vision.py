@@ -38,28 +38,35 @@ def render():
 
         analyze_clicked = st.button("🔍 Analyze Image", type="primary", use_container_width=True, key="btn_run_vision")
 
+    if analyze_clicked:
+        if not uploaded_file:
+            st.warning("Please upload an image first.")
+        else:
+            with st.spinner("Processing visual features with Gemini Vision..."):
+                img_bytes = uploaded_file.getvalue()
+                mime_type = uploaded_file.type or "image/jpeg"
+                analysis = analyze_vision_image(
+                    image_bytes=img_bytes,
+                    prompt=prompt,
+                    model=model,
+                    mime_type=mime_type
+                )
+                st.session_state.vision_last_analysis = analysis
+                st.session_state.vision_last_filename = uploaded_file.name
+
     with col_result:
         st.markdown("### 💡 Multimodal Analysis Output")
-        if analyze_clicked:
-            if not uploaded_file:
-                st.warning("Please upload an image first.")
-            else:
-                with st.spinner("Processing visual features with Gemini Vision..."):
-                    img_bytes = uploaded_file.getvalue()
-                    mime_type = uploaded_file.type or "image/jpeg"
-                    analysis = analyze_vision_image(
-                        image_bytes=img_bytes,
-                        prompt=prompt,
-                        model=model,
-                        mime_type=mime_type
-                    )
-                    st.markdown(analysis)
-                    st.download_button(
-                        "📥 Download Analysis (.txt)",
-                        data=analysis,
-                        file_name=f"vision_analysis_{uploaded_file.name}.txt",
-                        mime="text/plain",
-                        use_container_width=True
-                    )
+        last_analysis = st.session_state.get("vision_last_analysis")
+        if last_analysis:
+            st.markdown(last_analysis)
+            fn = st.session_state.get("vision_last_filename", "image")
+            st.download_button(
+                "📥 Download Analysis (.txt)",
+                data=last_analysis,
+                file_name=f"vision_analysis_{fn}.txt",
+                mime="text/plain",
+                use_container_width=True,
+                key="dl_vision_analysis_btn"
+            )
         else:
-            st.info("💡 Upload an image and click **Analyze Image** to see multimodal reasoning here.")
+            st.info("💡 Upload an image on the left and click **🔍 Analyze Image** to see multimodal reasoning here.")

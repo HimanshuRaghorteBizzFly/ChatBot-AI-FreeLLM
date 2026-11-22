@@ -1,5 +1,6 @@
 """
 Simple, user-friendly SaaS Sidebar navigation component.
+Supports safe two-way synchronization between sidebar radio and button navigations.
 """
 import streamlit as st
 
@@ -14,6 +15,18 @@ SIDEBAR_PAGES = [
     ("📜 Chat History", "Chat History"),
     ("⚙️ Platform Settings", "Settings")
 ]
+
+def set_page(page_name: str):
+    """
+    Safely navigates to a target page programmatically and keeps
+    the sidebar navigation radio completely in sync.
+    """
+    st.session_state.current_page = page_name
+    st.session_state._last_page = page_name
+    for label, key in SIDEBAR_PAGES:
+        if key == page_name:
+            st.session_state["simple_sidebar_nav"] = label
+            break
 
 def render_sidebar():
     """Renders a clean, user-friendly sidebar."""
@@ -51,7 +64,24 @@ def render_sidebar():
         page_labels = [p[0] for p in SIDEBAR_PAGES]
         page_keys = [p[1] for p in SIDEBAR_PAGES]
 
-        default_idx = page_keys.index(current_page) if current_page in page_keys else 0
+        # 1. Sync simple_sidebar_nav if current_page changed programmatically
+        if "_last_page" not in st.session_state:
+            st.session_state._last_page = current_page
+
+        if st.session_state._last_page != current_page:
+            for label, key in SIDEBAR_PAGES:
+                if key == current_page:
+                    st.session_state["simple_sidebar_nav"] = label
+                    break
+            st.session_state._last_page = current_page
+
+        target_label = page_labels[0]
+        for label, key in SIDEBAR_PAGES:
+            if key == current_page:
+                target_label = label
+                break
+
+        default_idx = page_labels.index(target_label) if target_label in page_labels else 0
 
         # Simple Navigation Radio
         selected_label = st.radio(
@@ -65,6 +95,7 @@ def render_sidebar():
         for p in SIDEBAR_PAGES:
             if p[0] == selected_label:
                 st.session_state.current_page = p[1]
+                st.session_state._last_page = p[1]
                 break
 
         st.markdown("<br>", unsafe_allow_html=True)

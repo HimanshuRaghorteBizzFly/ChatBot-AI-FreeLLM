@@ -14,8 +14,7 @@ OPENROUTER_MODELS = [
     "nvidia/nemotron-3.5-super-vl:free",
     "meta-llama/llama-3.3-70b-instruct:free",
     "google/gemini-2.0-flash-exp:free",
-    "qwen/qwen-2.5-coder-32b-instruct:free",
-    "microsoft/mai-image-2.7-flash"
+    "qwen/qwen-2.5-coder-32b-instruct:free"
 ]
 
 class OpenRouterProvider(BaseProvider):

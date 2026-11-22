@@ -5,10 +5,10 @@ Full conversation history management, search, renaming, transcript inspection, a
 import json
 import streamlit as st
 from components.navbar import render_navbar
+from components.sidebar import set_page
 from backend.repositories.storage import (
     list_conversations,
     get_conversation_messages,
-    rename_conversation,
     delete_conversation
 )
 
@@ -40,7 +40,7 @@ def render():
                 with act1:
                     if st.button("Resume", key=f"hist_resume_{c['id']}", use_container_width=True):
                         st.session_state.active_conversation_id = c["id"]
-                        st.session_state.current_page = "Chat Playground"
+                        set_page("Chat Playground")
                         st.rerun()
                 with act2:
                     if st.button("Delete", key=f"hist_del_{c['id']}", use_container_width=True):

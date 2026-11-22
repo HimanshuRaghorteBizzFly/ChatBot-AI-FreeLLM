@@ -6,6 +6,7 @@ and instant chat starter.
 import streamlit as st
 from components.navbar import render_navbar
 from components.model_card import render_model_card
+from components.sidebar import set_page
 from backend.services.catalog import filter_catalog
 
 def render():
@@ -20,7 +21,7 @@ def render():
             st.markdown("#### 💬 AI Chat")
             st.caption("Multi-turn reasoning with Nemotron, Gemini & Groq")
             if st.button("Open Chat", key="hub_open_chat", use_container_width=True, type="primary"):
-                st.session_state.current_page = "Chat Playground"
+                set_page("Chat Playground")
                 st.rerun()
 
     with t2:
@@ -28,7 +29,7 @@ def render():
             st.markdown("#### 🎨 Image Studio")
             st.caption("High-res art generation with Microsoft MAI")
             if st.button("Generate Art", key="hub_open_img", use_container_width=True):
-                st.session_state.current_page = "Image Studio"
+                set_page("Image Studio")
                 st.rerun()
 
     with t3:
@@ -36,7 +37,7 @@ def render():
             st.markdown("#### 👁️ Vision Studio")
             st.caption("Upload images & ask questions with Gemini Vision")
             if st.button("Analyze Image", key="hub_open_vision", use_container_width=True):
-                st.session_state.current_page = "Vision Studio"
+                set_page("Vision Studio")
                 st.rerun()
 
     with t4:
@@ -44,7 +45,7 @@ def render():
             st.markdown("#### 🎙️ Voice & Audio")
             st.caption("Whisper transcription & neural voice synthesis")
             if st.button("Open Audio", key="hub_open_voice", use_container_width=True):
-                st.session_state.current_page = "Speech Studio"
+                set_page("Speech Studio")
                 st.rerun()
 
     st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)

@@ -1,11 +1,14 @@
 """
 AI Chat Playground View.
 Multi-turn conversational interface with streaming, reasoning traces, parameter tuning,
-and SQLAlchemy database persistence.
+and SQLite database persistence.
+Dedicated strictly to Text, Reasoning, and Code generation.
 """
+import os
 import json
 import streamlit as st
 from components.navbar import render_navbar
+from components.sidebar import set_page
 from backend.services.chat import stream_chat_response
 from backend.repositories.storage import (
     create_conversation,
@@ -18,7 +21,16 @@ from backend.providers.registry import registry
 from backend.config import get_config_var
 
 def render():
-    render_navbar("💬 AI Chat Playground", "Multi-Turn Streaming with Deep Reasoning & Model Switching")
+    render_navbar("💬 AI Chat & Coding Playground", "Multi-Turn Streaming with Deep Reasoning & Model Switching")
+
+    # Banner separating Text Chat from Image Generation
+    b_col1, b_col2 = st.columns([3.5, 1.2])
+    with b_col1:
+        st.info("💡 **Text & Coding Chat Mode**: Ask questions, generate code, or explore deep reasoning. For visual artwork, visit the **Image Studio**.")
+    with b_col2:
+        if st.button("🎨 Go to Image Studio", use_container_width=True, key="chat_to_img_banner"):
+            set_page("Image Studio")
+            st.rerun()
 
     # Ensure active conversation ID exists in session state
     if "active_conversation_id" not in st.session_state or not st.session_state.active_conversation_id:
@@ -80,7 +92,7 @@ def render():
         with sys_col:
             system_prompt = st.text_area(
                 "System Prompt",
-                value="You are an expert, insightful, and helpful AI assistant. Provide clear, structured, and accurate responses.",
+                value="You are an expert, insightful, and helpful AI assistant. Provide clear, structured, and accurate responses with code examples where relevant.",
                 height=90,
                 key="chat_system_prompt"
             )
@@ -101,7 +113,7 @@ def render():
                 with st.expander("🧠 View Chain of Thought"):
                     st.markdown(msg["reasoning"])
             st.markdown(msg["content"])
-            if msg.get("image_path"):
+            if msg.get("image_path") and os.path.exists(msg["image_path"]):
                 st.image(msg["image_path"], use_container_width=True)
 
     # Chat Input Box

@@ -4,6 +4,7 @@ Simple, user-friendly Model Card component.
 """
 import streamlit as st
 from backend.schemas.types import ModelCatalogItem
+from components.sidebar import set_page
 
 def render_model_card(model: ModelCatalogItem, on_try_key: str = None):
     """Renders a clean, user-friendly model card."""
@@ -39,14 +40,14 @@ def render_model_card(model: ModelCatalogItem, on_try_key: str = None):
         action_label = "🎨 Generate Image" if "image" in model.capabilities else "👁️ Analyze Vision" if "vision" in model.capabilities else "💬 Launch in Chat"
         if st.button(action_label, key=btn_key, use_container_width=True, type="primary"):
             if "image" in model.capabilities:
-                st.session_state.current_page = "Image Studio"
+                set_page("Image Studio")
             elif "vision" in model.capabilities:
-                st.session_state.current_page = "Vision Studio"
+                set_page("Vision Studio")
             elif "speech" in model.capabilities or "speech_to_text" in model.capabilities:
-                st.session_state.current_page = "Speech Studio"
+                set_page("Speech Studio")
             elif "video" in model.capabilities:
-                st.session_state.current_page = "Video Studio"
+                set_page("Video Studio")
             else:
-                st.session_state.current_page = "Chat Playground"
+                set_page("Chat Playground")
                 st.session_state.selected_model = model.id
             st.rerun()
