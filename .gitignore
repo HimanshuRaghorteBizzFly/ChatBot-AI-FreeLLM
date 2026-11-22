@@ -9,6 +9,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.pyd
+.pytest_cache/
 
 # Environment Variables & Secrets (CRITICAL)
 .env
@@ -19,8 +20,15 @@ api keys.txt
 # Streamlit Local Secrets
 .streamlit/secrets.toml
 
-# Generated Content & Cache
+# SQLite Database Files
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/*.db-journal
+
+# Generated Media Content
 generated_images/
+generated_audio/
 .cache/
 *.log
 
@@ -29,12 +37,3 @@ generated_images/
 Thumbs.db
 .vscode/
 .idea/
-
-.env
-.env.*
-!.env.example
-.venv/
-venv/
-__pycache__/
-*.pyc
-.streamlit/secrets.toml

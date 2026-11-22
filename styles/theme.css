@@ -1,0 +1,196 @@
+/* ============================================================
+   AI ChatBot & Vision Studio — SaaS Design Tokens
+   Theme: White + Blue + Purple
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --bg-light: #F8FAFF;
+    --surface-light: #FFFFFF;
+    --primary: #2563EB;
+    --secondary: #7C3AED;
+    --accent: #06B6D4;
+    --text-dark: #111827;
+    --muted-light: #64748B;
+    --border-light: #E2E8F0;
+    --primary-gradient: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+    --surface-gradient: linear-gradient(135deg, #FFFFFF 0%, #F8FAFF 100%);
+}
+
+/* Base App Styling */
+html, body, [data-testid="stAppViewContainer"] {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+/* Light Mode Overrides */
+.theme-light, [data-testid="stAppViewContainer"].theme-light {
+    background-color: var(--bg-light) !important;
+    color: var(--text-dark) !important;
+}
+
+/* Dark Mode Overrides */
+.theme-dark, [data-testid="stAppViewContainer"].theme-dark {
+    background-color: #0B0D14 !important;
+    color: #F1F5F9 !important;
+}
+
+/* Sticky Top Navigation Bar */
+.saas-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.6rem;
+    border-radius: 14px;
+    margin-bottom: 1.4rem;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+}
+
+.theme-light .saas-navbar {
+    background: #FFFFFF;
+    border: 1px solid var(--border-light);
+}
+
+.theme-dark .saas-navbar {
+    background: #131622;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Status Badges */
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-primary {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563EB;
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.badge-secondary {
+    background: rgba(124, 58, 237, 0.12);
+    color: #7C3AED;
+    border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* SaaS Metric Card */
+.metric-card {
+    border-radius: 16px;
+    padding: 1.3rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+}
+
+.theme-light .metric-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-light);
+}
+
+.theme-dark .metric-card {
+    background: #131622;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0.2rem 0;
+}
+
+.metric-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted-light);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Model Card */
+.model-card {
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.theme-light .model-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.theme-dark .model-card {
+    background: #141724;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Modern Chat Bubbles */
+.theme-light [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    background: var(--primary-gradient) !important;
+    color: #FFFFFF !important;
+    border-radius: 16px 16px 4px 16px !important;
+}
+
+.theme-light [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+    background: #FFFFFF !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-dark) !important;
+    border-radius: 16px 16px 16px 4px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+.theme-dark [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    background: linear-gradient(135deg, #312E81 0%, #4338CA 100%) !important;
+    color: #FFFFFF !important;
+    border-radius: 16px 16px 4px 16px !important;
+    border: 1px solid rgba(99, 102, 241, 0.35) !important;
+}
+
+.theme-dark [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+    background: #141726 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #F1F5F9 !important;
+    border-radius: 16px 16px 16px 4px !important;
+}
+
+/* Streamlit Buttons */
+.stButton > button {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px) !important;
+}
