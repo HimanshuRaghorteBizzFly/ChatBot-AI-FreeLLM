@@ -13,6 +13,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from backend.database import init_db
+from backend.logger import log_event
 from components.sidebar import render_sidebar
 from views import (
     dashboard,
@@ -44,6 +45,10 @@ st.set_page_config(
 
 # 2. Initialize Database & Session State
 init_db()
+
+if "_app_logged" not in st.session_state:
+    st.session_state._app_logged = True
+    log_event("info", "APP_BOOT", "AI Studio interface initialized")
 
 if "current_page" not in st.session_state:
     st.session_state.current_page = "Dashboard"

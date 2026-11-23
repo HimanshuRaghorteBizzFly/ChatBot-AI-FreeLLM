@@ -1,11 +1,14 @@
 """
 Free AI provider adapter (zero setup, no API key required).
+Provides instant cloud LLM with zero-config pipeline and offline resilience.
 """
 import json
 import urllib.request
+import urllib.error
 from typing import List, Dict, Any, Generator, Optional
 from backend.providers.base import BaseProvider
 from backend.schemas.types import ModelCatalogItem
+from backend.security import sanitize_text
 
 class FreeAIProvider(BaseProvider):
     def __init__(self):
@@ -51,9 +54,12 @@ class FreeAIProvider(BaseProvider):
             req = urllib.request.Request(
                 self.endpoint,
                 data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"}
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ChatBot-AI/1.0"
+                }
             )
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with urllib.request.urlopen(req, timeout=25) as resp:
                 for line in resp:
                     line_str = line.decode("utf-8", errors="ignore").strip()
                     if line_str.startswith("data: "):
@@ -70,5 +76,8 @@ class FreeAIProvider(BaseProvider):
                                     yield content
                         except Exception:
                             pass
+        except urllib.error.URLError as e:
+            # Clean network offline or DNS block handling
+            yield f"⚠️ **Free AI Service Notice:** Unable to reach free cloud endpoint ({sanitize_text(str(e))}). Please check your internet connection or use an API key for Google Gemini, Groq, or OpenRouter in the sidebar."
         except Exception as e:
-            yield f"⚠️ **Free AI Service Error:** {str(e)}"
+            yield f"⚠️ **Free AI Service Error:** {sanitize_text(str(e))}"

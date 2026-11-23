@@ -1,5 +1,5 @@
 """
-Tests for SQLAlchemy database repository and entities.
+Tests for database repository, indices, entities, and multi-tenant data isolation.
 """
 import pytest
 from backend.database import init_db, get_db
@@ -8,6 +8,7 @@ from backend.repositories.storage import (
     list_conversations,
     get_conversation_messages,
     add_message,
+    delete_conversation,
     create_saved_prompt,
     list_saved_prompts,
     delete_saved_prompt,
@@ -40,6 +41,26 @@ def test_conversation_lifecycle():
 
     convs = list_conversations()
     assert any(c["id"] == conv_id for c in convs)
+
+def test_tenant_data_isolation():
+    # User 1 creates conversation
+    conv_id_user1 = create_conversation(title="User 1 Secret Chat", user_id=1)
+    add_message(conv_id_user1, role="user", content="Secret confidential data for user 1")
+
+    # User 2 attempts to read user 1's messages
+    messages_viewed_by_user2 = get_conversation_messages(conv_id_user1, user_id=2)
+    assert len(messages_viewed_by_user2) == 0, "User 2 should not have access to User 1's conversation messages"
+
+    # User 2 attempts to delete user 1's conversation
+    del_result = delete_conversation(conv_id_user1, user_id=2)
+    assert del_result is False, "User 2 should not be able to delete User 1's conversation"
+
+    # User 1 can still access the conversation
+    messages_viewed_by_user1 = get_conversation_messages(conv_id_user1, user_id=1)
+    assert len(messages_viewed_by_user1) >= 1
+
+    # Clean up
+    delete_conversation(conv_id_user1, user_id=1)
 
 def test_saved_prompts_crud():
     prompt_id = create_saved_prompt("Pytest Test Prompt", "Test prompt instruction content", category="Coding")

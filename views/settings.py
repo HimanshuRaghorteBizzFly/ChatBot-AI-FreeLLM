@@ -1,6 +1,7 @@
 """
 Settings & Preferences View.
 User preferences, default engine configuration, system diagnostics, and database maintenance.
+Hardened with live system health auditing and storage verification.
 """
 import os
 import sys
@@ -9,13 +10,14 @@ import streamlit as st
 from components.navbar import render_navbar
 from backend.repositories.storage import get_user_preferences, update_user_preferences
 from backend.database import DB_PATH
+from backend.services.health import get_system_health
 
 def render():
     render_navbar("⚙️ Platform Settings", "Configure Defaults, System Diagnostics & Storage Maintenance")
 
     prefs = get_user_preferences()
 
-    tab1, tab2 = st.tabs(["🎛️ Default Model & Engine", "🛠️ System Diagnostics & Storage"])
+    tab1, tab2 = st.tabs(["🎛️ Default Model & Engine", "🛠️ System Diagnostics & Health"])
 
     with tab1:
         st.markdown("### ⚙️ Inference Defaults")
@@ -55,16 +57,35 @@ def render():
 
     with tab2:
         st.markdown("### 🖥️ System & Environment Diagnostics")
+        health = get_system_health()
+
+        # Health status badge
+        status_color = "#10B981" if health["status"] == "healthy" else "#F59E0B"
+        st.markdown(
+            f"<div style='margin-bottom: 1rem;'><span style='font-size: 1.1rem; font-weight: 700; color: {status_color};'>● System Status: {health['status'].upper()}</span></div>",
+            unsafe_allow_html=True
+        )
+
         col_d1, col_d2 = st.columns(2)
         with col_d1:
-            st.markdown(f"**Python Runtime:** `{sys.version.split()[0]}`")
-            st.markdown(f"**Operating System:** `{platform.system()} {platform.release()}`")
+            st.markdown(f"**Python Runtime:** `{health['runtime']['python_version']}`")
+            st.markdown(f"**Operating System:** `{health['runtime']['platform']}`")
+            st.markdown(f"**Environment:** `{health['runtime']['environment']}`")
             st.markdown(f"**Streamlit Version:** `{st.__version__}`")
         with col_d2:
             db_size = os.path.getsize(DB_PATH) if os.path.exists(DB_PATH) else 0
-            st.markdown(f"**Database Engine:** `SQLite / SQLAlchemy ORM`")
-            st.markdown(f"**Database Path:** `{DB_PATH}`")
+            st.markdown(f"**Database Engine:** `SQLite (WAL Mode)`")
+            st.markdown(f"**Database Integrity:** `{health['database'].get('quick_check', 'ok')}`")
             st.markdown(f"**Database Size:** `{db_size / 1024:.2f} KB`")
+            st.markdown(f"**Free Disk Space:** `{health.get('disk_free_gb', 0)} GB`")
+
+        st.divider()
+        st.markdown("### 🔌 Provider Connectivity Readiness")
+        p_cols = st.columns(5)
+        for idx, (p_name, configured) in enumerate(health.get("providers_status", {}).items()):
+            with p_cols[idx % 5]:
+                badge = "🟢 Ready" if configured else "🟡 No Key"
+                st.metric(label=p_name, value=badge)
 
         st.divider()
         st.markdown("### ⚠️ Storage Maintenance")

@@ -1,20 +1,20 @@
 """
 Credentials management service.
-Handles safe key masking, persistence to .env, and validation.
+Handles zero-leak key masking, persistence to .env, and provider validation.
 """
 from typing import Dict, Any
 from backend.config import get_config_var, save_config_var
+from backend.security import mask_secret, validate_api_key_format
 from backend.providers.registry import registry
 
-def get_masked_key(key: str) -> str:
-    """Safely masks an API key (e.g. sk-or...b446)."""
-    if not key:
-        return "Not Configured"
-    if len(key) <= 8:
-        return "****"
-    return f"{key[:6]}...{key[-4:]}"
+# Backward-compatibility alias
+get_masked_key = mask_secret
 
 def get_all_credentials_info() -> Dict[str, Dict[str, Any]]:
+    """
+    Returns sanitized metadata for all configured providers.
+    Never exposes raw secrets.
+    """
     providers = [
         {"name": "OpenRouter", "env_var": "OPENROUTER_API_KEY", "desc": "For NVIDIA Nemotron & Microsoft MAI-Image-2.7 Flash"},
         {"name": "Google Gemini", "env_var": "GEMINI_API_KEY", "desc": "For Gemini 3.1 Flash Lite, 3.8 Flash & Vision"},
@@ -27,16 +27,17 @@ def get_all_credentials_info() -> Dict[str, Dict[str, Any]]:
         raw_key = get_config_var(p["env_var"])
         provider_obj = registry.get_provider(p["name"])
         is_valid = provider_obj.validate_credentials() if (raw_key and provider_obj) else False
-        
+
         result[p["name"]] = {
             "name": p["name"],
             "env_var": p["env_var"],
             "description": p["desc"],
             "has_key": bool(raw_key),
-            "masked_key": get_masked_key(raw_key),
+            "masked_key": mask_secret(raw_key),
             "is_valid": is_valid
         }
     return result
 
 def update_credential(env_var: str, key_value: str) -> bool:
+    """Saves a new key safely to environment."""
     return save_config_var(env_var, key_value)

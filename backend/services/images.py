@@ -1,6 +1,7 @@
 """
 Image Studio service.
 Generates images, saves locally to prevent broken icons, and registers generation in database.
+Hardened with input validation, aspect ratio whitelisting, and secret sanitization.
 """
 import os
 import time
@@ -8,9 +9,12 @@ import urllib.parse
 import requests
 from pathlib import Path
 from typing import Dict, Any, Optional
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from backend.config import MEDIA_DIR, get_config_var
 from backend.repositories.storage import save_generated_media, save_generation_job, log_usage
+from backend.security import sanitize_text
+
+ALLOWED_ASPECT_RATIOS = {"1:1", "16:9", "9:16", "4:3"}
 
 def create_fallback_image(prompt: str, path: Path, width: int = 1024, height: int = 1024) -> str:
     """
@@ -64,26 +68,27 @@ def generate_image_studio(
     local_path = MEDIA_DIR / filename
 
     key = api_key or get_config_var("OPENROUTER_API_KEY")
-    clean_prompt = prompt.strip() if prompt else "Futuristic AI Studio"
+    # Sanitize and truncate prompt
+    clean_prompt = prompt.strip().replace("\x00", "")[:2000] if prompt else "Futuristic AI Studio"
     encoded = urllib.parse.quote(clean_prompt)
 
-    # Map aspect ratio dimensions
+    # Validate aspect ratio against whitelist
+    clean_ratio = aspect_ratio if aspect_ratio in ALLOWED_ASPECT_RATIOS else "1:1"
     dim_map = {
         "1:1": (1024, 1024),
         "16:9": (1280, 720),
         "9:16": (720, 1280),
         "4:3": (1024, 768)
     }
-    width, height = dim_map.get(aspect_ratio, (1024, 1024))
+    width, height = dim_map.get(clean_ratio, (1024, 1024))
 
-    # Standard browser user agent to avoid bot blocks
     request_headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
     }
 
     # 1. Try OpenRouter direct API if key exists and has credits
-    if key and not key.startswith("sk-or-v1-placeholder"):
+    if key and not key.startswith("sk-or-v1-placeholder") and len(key) >= 20:
         or_headers = {
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
@@ -120,7 +125,7 @@ def generate_image_studio(
 
     for url in sources:
         try:
-            resp = requests.get(url, headers=request_headers, timeout=12)
+            resp = requests.get(url, headers=request_headers, timeout=10)
             if resp.status_code == 200 and len(resp.content) > 1000:
                 with open(local_path, "wb") as f:
                     f.write(resp.content)
@@ -147,9 +152,9 @@ def generate_image_studio(
             "notice": "🎨 Visual generated via Studio Canvas Engine."
         }
     except Exception as e:
-        save_generation_job("image", "Microsoft AI", model, clean_prompt, "failed", error_message=str(e))
+        save_generation_job("image", "Microsoft AI", model, clean_prompt, "failed", error_message=sanitize_text(str(e)))
         return {
             "path": None,
             "model": "Microsoft AI: MAI-Image-2.7 Flash",
-            "notice": f"⚠️ Generation error: {str(e)}"
+            "notice": f"⚠️ Generation error: {sanitize_text(str(e))}"
         }

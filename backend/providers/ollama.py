@@ -1,17 +1,19 @@
 """
 Ollama provider adapter.
 Supports local Ollama (http://localhost:11434) and Ollama Cloud.
+Hardened with connection timeouts, error mapping, and secret sanitization.
 """
 from typing import List, Dict, Any, Generator, Optional
 from backend.providers.base import BaseProvider
 from backend.schemas.types import ModelCatalogItem
 from backend.config import get_config_var
+from backend.security import sanitize_text
 
 class OllamaProvider(BaseProvider):
     def __init__(self, host: str = "http://localhost:11434", api_key: Optional[str] = None):
         key = api_key or get_config_var("OLLAMA_API_KEY")
         super().__init__("Ollama", key)
-        self.host = host
+        self.host = host or "http://localhost:11434"
 
     def validate_credentials(self) -> bool:
         try:
@@ -99,10 +101,18 @@ class OllamaProvider(BaseProvider):
                 content = chunk.get("message", {}).get("content", "")
                 if content:
                     yield content
-        except ResponseError as e:
-            if getattr(e, "status_code", None) == 402:
-                yield "⚠️ **Ollama Cloud Credits Required (HTTP 402)**. Switch to **Google Gemini** or **NVIDIA Nemotron** for free access."
-            else:
-                yield f"⚠️ **Ollama Error:** {str(e)}"
         except Exception as e:
-            yield f"⚠️ **Ollama Connection Error:** {str(e)}"
+            err_text = str(e)
+            if "402" in err_text:
+                yield (
+                    "⚠️ **Ollama Cloud Credits Required (HTTP 402)**\n\n"
+                    "Your Ollama Cloud account requires usage credits.\n\n"
+                    "👉 **Free Alternative:** Switch provider to **🟢 NVIDIA Nemotron (Free)**, **✨ Google Gemini**, or **🌟 Free AI** in the sidebar!"
+                )
+            elif "Connection refused" in err_text or "11434" in err_text:
+                yield (
+                    "⚠️ **Ollama Connection Refused:** Local Ollama daemon is not running on localhost:11434.\n\n"
+                    "👉 Start Ollama Desktop or switch to **🌟 Free AI** / **✨ Google Gemini** in the sidebar."
+                )
+            else:
+                yield f"⚠️ **Ollama Error:** {sanitize_text(err_text)}"

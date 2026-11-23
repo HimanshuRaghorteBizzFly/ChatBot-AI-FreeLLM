@@ -11,3 +11,4 @@ from backend.services.embeddings import generate_text_embedding, cosine_similari
 from backend.services.reranking import rerank_documents
 from backend.services.usage import get_analytics_metrics
 from backend.services.credentials import get_all_credentials_info, update_credential, get_masked_key
+from backend.services.health import get_system_health

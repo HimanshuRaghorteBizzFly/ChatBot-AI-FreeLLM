@@ -3,37 +3,53 @@
 venv/
 env/
 ENV/
+.env*/
 
-# Python Bytecode & Cache
+# Python Bytecode, Compilations & Cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyd
 .pytest_cache/
+.coverage
+htmlcov/
 
-# Environment Variables & Secrets (CRITICAL)
+# Secrets, Environment Variables & Sensitive Credentials (CRITICAL)
 .env
+.env.*
+!.env.example
 api keys.txt
 *.key
 *.pem
+*.crt
+*.pfx
+*.p12
 
-# Streamlit Local Secrets
+# Streamlit Local Secrets & Configuration Overrides
 .streamlit/secrets.toml
 
-# SQLite Database Files
+# SQLite Database Files & WAL logs
 data/*.db
 data/*.db-wal
 data/*.db-shm
 data/*.db-journal
+*.db
+*.db-wal
+*.db-shm
 
-# Generated Media Content
+# Generated Media Content & Uploads
 generated_images/
 generated_audio/
+uploads/
 .cache/
 *.log
+logs/
 
-# OS & Editor Metadata
+# OS, IDE & Editor Metadata
 .DS_Store
 Thumbs.db
+desktop.ini
 .vscode/
 .idea/
+*.sublime-workspace
+*.sublime-project

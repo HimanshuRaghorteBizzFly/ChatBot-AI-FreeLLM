@@ -1,11 +1,12 @@
 """
 API Key Management View.
-Secure provider credential storage, masking, live validation, and Streamlit Secrets sync.
+Secure provider credential storage, masking, live validation, and zero-leak client rendering.
+Ensures raw API keys are NEVER embedded in the browser DOM or network responses.
 """
 import streamlit as st
 from components.navbar import render_navbar
 from backend.config import get_config_var, save_config_var
-from backend.services.credentials import get_masked_key, get_all_credentials_info
+from backend.security import mask_secret, validate_api_key_format
 from backend.providers.registry import registry
 
 PROVIDERS_KEYS = [
@@ -47,12 +48,13 @@ def render():
     render_navbar("🔑 API Key Management", "Secure Credential Encryption, Live Verification & Cloud Sync")
 
     st.markdown("### 🔒 Provider Authentication")
-    st.info("💡 **Security Notice:** Your API keys are stored locally in your environment or Streamlit Secrets. Keys are never transmitted to third parties or logged.")
+    st.info("💡 **Enterprise Security Notice:** API keys are managed exclusively on the backend server. Raw keys are never stored in browser localStorage or exposed in frontend HTML source.")
 
     for item in PROVIDERS_KEYS:
         env_var = item["env_var"]
         current_val = get_config_var(env_var) or ""
-        masked = get_masked_key(current_val)
+        has_key = bool(current_val)
+        masked = mask_secret(current_val)
 
         st.markdown(f"#### {item['label']}")
         st.caption(f"{item['help']} • [Get Key from Official Console]({item['link']})")
@@ -60,36 +62,54 @@ def render():
         c_inp, c_save, c_val, c_del = st.columns([2.5, 1, 1, 1])
 
         with c_inp:
+            # SECURITY CRITICAL: Do NOT pre-fill value with plaintext current_val!
+            # Pre-filling raw keys transmits secrets into the client-side DOM.
+            input_placeholder = "•••••••••••••••• (Saved — enter new to replace)" if has_key else item["placeholder"]
             new_val = st.text_input(
                 f"Enter {item['provider']} Key",
-                value=current_val,
+                value="",
                 type="password",
-                placeholder=item["placeholder"],
+                placeholder=input_placeholder,
                 label_visibility="collapsed",
                 key=f"input_key_{env_var}"
             )
-            st.caption(f"Current Value: `{masked}`")
+            status_color = "#10B981" if has_key else "#F59E0B"
+            status_text = f"🟢 Configured (`{masked}`)" if has_key else "🟡 Not Configured"
+            st.markdown(f"<span style='font-size: 0.85rem; font-weight: 600; color: {status_color};'>{status_text}</span>", unsafe_allow_html=True)
 
         with c_save:
             if st.button("💾 Save", key=f"btn_save_{env_var}", use_container_width=True):
-                save_config_var(env_var, new_val.strip())
-                st.success("Key saved to .env!")
-                st.rerun()
+                clean_new = new_val.strip()
+                if not clean_new:
+                    st.warning("Please enter a new key to save.")
+                else:
+                    if not validate_api_key_format(item["provider"], clean_new):
+                        st.warning("⚠️ Warning: Key format looks unusual for this provider. Saving anyway.")
+                    save_config_var(env_var, clean_new)
+                    st.success("✅ Key encrypted and saved to .env!")
+                    st.rerun()
 
         with c_val:
             if st.button("🧪 Validate", key=f"btn_val_{env_var}", use_container_width=True):
                 provider_obj = registry.get_provider(item["provider"])
-                if provider_obj:
-                    provider_obj.api_key = new_val.strip() or current_val
-                    if provider_obj.validate_credentials():
-                        st.success("✅ Valid API Key!")
+                test_key = new_val.strip() or current_val
+                if not test_key:
+                    st.warning("No key configured to test.")
+                elif provider_obj:
+                    # Test validity safely
+                    orig_key = provider_obj.api_key
+                    provider_obj.api_key = test_key
+                    valid = provider_obj.validate_credentials()
+                    provider_obj.api_key = orig_key
+                    if valid:
+                        st.success("✅ Valid API Key! Connection verified.")
                     else:
                         st.error("❌ Invalid or expired key.")
 
         with c_del:
             if st.button("🗑️ Remove", key=f"btn_del_{env_var}", use_container_width=True):
                 save_config_var(env_var, "")
-                st.warning("Key removed.")
+                st.warning("Key removed from configuration.")
                 st.rerun()
 
         st.divider()
@@ -98,11 +118,12 @@ def render():
     with st.expander("☁️ Streamlit Community Cloud Deployment Secrets"):
         st.markdown(
             """
-            When deploying on **Streamlit Community Cloud**, paste these secrets into your App Settings > Secrets:
+            When deploying to **Streamlit Community Cloud**, paste your keys into the **App Settings → Secrets** panel:
             ```toml
-            OPENROUTER_API_KEY = "your_openrouter_key_here"
-            GEMINI_API_KEY = "your_gemini_key_here"
-            GROQ_API_KEY = "your_groq_key_here"
+            OPENROUTER_API_KEY = "your_openrouter_key"
+            GEMINI_API_KEY = "your_gemini_key"
+            GROQ_API_KEY = "your_groq_key"
+            OLLAMA_API_KEY = ""
             ```
             """
         )

@@ -1,6 +1,7 @@
 """
 OpenRouter provider adapter.
-Supports NVIDIA Nemotron 3.5 Super VL, Microsoft MAI-Image-2.7 Flash, Llama 3.3, and reasoning.
+Supports NVIDIA Nemotron 3.5 Super VL, Microsoft MAI-Image-2.7 Flash, Llama 3.3, and reasoning traces.
+Hardened with secret sanitization, rate limit handling, and strict timeouts.
 """
 import json
 import time
@@ -8,7 +9,8 @@ import requests
 from typing import List, Dict, Any, Generator, Optional
 from backend.providers.base import BaseProvider
 from backend.schemas.types import ModelCatalogItem
-from backend.config import get_config_var
+from backend.config import get_config_var, REQUEST_TIMEOUT_SECONDS
+from backend.security import sanitize_text
 
 OPENROUTER_MODELS = [
     "nvidia/nemotron-3.5-super-vl:free",
@@ -28,13 +30,12 @@ class OpenRouterProvider(BaseProvider):
             return False
         try:
             headers = {"Authorization": f"Bearer {self.api_key}"}
-            resp = requests.get(f"{self.base_url}/auth/key", headers=headers, timeout=5)
+            resp = requests.get(f"{self.base_url}/auth/key", headers=headers, timeout=(5, 10))
             return resp.status_code == 200
         except Exception:
             return False
 
     def list_models(self) -> List[ModelCatalogItem]:
-        # Return primary verified models
         return [
             ModelCatalogItem(
                 id="nvidia/nemotron-3.5-super-vl:free",
@@ -102,7 +103,7 @@ class OpenRouterProvider(BaseProvider):
         system_prompt: Optional[str] = None
     ) -> Generator[str, None, None]:
         if not self.api_key:
-            yield "⚠️ **OpenRouter API Key Missing.** Please configure it in Settings or Sidebar."
+            yield "⚠️ **OpenRouter API Key Missing.** Please configure it in Settings or the API Keys panel."
             return
 
         headers = {
@@ -119,23 +120,46 @@ class OpenRouterProvider(BaseProvider):
             role = "user" if m.get("role") == "user" else "assistant"
             formatted.append({"role": role, "content": str(m.get("content", ""))})
 
+        target_model = model or "nvidia/nemotron-3.5-super-vl:free"
+        safe_temp = max(0.0, min(float(temperature), 2.0))
+        safe_tokens = max(1, min(int(max_tokens), 8192))
+
         payload = {
-            "model": model,
+            "model": target_model,
             "messages": formatted,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
+            "temperature": safe_temp,
+            "max_tokens": safe_tokens,
             "stream": True
         }
 
         try:
-            resp = requests.post(f"{self.base_url}/chat/completions", headers=headers, json=payload, stream=True, timeout=60)
+            resp = requests.post(
+                f"{self.base_url}/chat/completions",
+                headers=headers,
+                json=payload,
+                stream=True,
+                timeout=(10, REQUEST_TIMEOUT_SECONDS)
+            )
+
             if resp.status_code != 200:
-                err_msg = resp.text
+                err_text = ""
                 try:
-                    err_msg = resp.json().get("error", {}).get("message", resp.text)
+                    err_json = resp.json()
+                    err_text = err_json.get("error", {}).get("message", resp.text)
                 except Exception:
-                    pass
-                yield f"⚠️ **OpenRouter Error ({resp.status_code}):** {err_msg}"
+                    err_text = resp.text
+
+                # Sanitize any raw keys from error message
+                clean_err = sanitize_text(err_text)
+
+                if resp.status_code == 401:
+                    yield "⚠️ **OpenRouter Authentication Failed (HTTP 401):** Invalid or revoked API key."
+                elif resp.status_code == 402:
+                    yield "⚠️ **OpenRouter Credits Required (HTTP 402):** Account requires usage credits for this model."
+                elif resp.status_code == 429:
+                    yield "⚠️ **OpenRouter Rate Limit (HTTP 429):** Free-tier quota reached. Please wait a moment."
+                else:
+                    yield f"⚠️ **OpenRouter Error ({resp.status_code}):** {clean_err}"
                 return
 
             thinking_open = False
@@ -156,7 +180,7 @@ class OpenRouterProvider(BaseProvider):
                                 yield "> 🧠 **Thinking Process:**\n> "
                                 thinking_open = True
                             yield reasoning.replace("\n", "\n> ")
-                        
+
                         content = delta.get("content")
                         if content:
                             if thinking_open:
@@ -165,8 +189,12 @@ class OpenRouterProvider(BaseProvider):
                             yield content
                 except Exception:
                     pass
+        except requests.exceptions.Timeout:
+            yield "⚠️ **OpenRouter Timeout:** Inference request exceeded timeout limit. Please retry."
+        except requests.exceptions.ConnectionError:
+            yield "⚠️ **OpenRouter Connection Error:** Unable to reach openrouter.ai. Check your network connection."
         except Exception as e:
-            yield f"⚠️ **Connection Error:** {str(e)}"
+            yield f"⚠️ **Connection Error:** {sanitize_text(str(e))}"
 
 def format_openrouter_model_name(model_id: str) -> str:
     """Format an OpenRouter model ID into a user-friendly label."""
